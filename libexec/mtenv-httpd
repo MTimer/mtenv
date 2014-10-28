@@ -126,7 +126,7 @@ httpd_ModFastcgiInstall()
 		else
 			sed -i "s@^LoadModule rewrite_module.*@LoadModule rewrite_module modules/mod_rewrite.so\nLoadModule fastcgi_module modules/mod_fastcgi.so@" /mtimer/server/httpd/conf/httpd.conf
 		fi
-		sed -i "s@^#ServerName .*@ServerName test.com:80@" /mtimer/server/httpd/conf/httpd.conf
+		sed -i "s@^#ServerName .*@ServerName example.com:80@" /mtimer/server/httpd/conf/httpd.conf
 	fi
 	make
 	make install
