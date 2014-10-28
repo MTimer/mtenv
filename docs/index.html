@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!--[if lt IE 9]><script type="text/javascript" src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+<title>MTEnv - Simple Lnmpa Server Management [Apache/Nginx|MySQL/MaridDB|PHP]</title>
+<meta charset="utf-8" />
+<meta name="keywords" content="mtenv, lnmp, lnmpa, lamp, Apache, Nginx, MySQL, MariaDB, PHP, Linux, LAMP script, LNMP script, LNMPA 一键安装脚本" />
+<meta name="description" content="MTEnv - Simple Lnmpa Server Management [Apache-Nginx|MySQL-MaridDB|PHP]" />
+
+<!--<link href='http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700&amp;subset=latin' rel='stylesheet' type='text/css' />-->
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/mod.css" />
+</head>
+
+
+<body>
+<header>
+<div class="headerCore">
+	<h1 class="logo"><strong>MTEnv</strong> <span>—</span> Simple Lnmpa Server Management <a href="http://www.mtimer.cn/" target="_blank">Demo</a> <a href="cn/">中文</a></h1> 
+
+	<div class="yashare-auto-init"></div> 
+
+	<div title="MTEnv Version and Help" class="MTEnvVer">20141028</div>
+	<a class="changes fancybox fancybox.ajax" href="http://api.mtimer.cn/mtenv/ver.php">Changes</a>
+</div>
+</header>
+
+
+
+<div id="wrapper">
+	<div id="content">
+		<section>
+	<h1><span>MTEnv<a href="#mainInfo" title="MTEnv Family" class="about fancybox"></a></span></h1>
+	<div id="mainInfo" class="upCont">
+		<strong class="modalTitle">MTEnv</strong>
+		<div class="section">
+			<h3>What is MTEnv?</h3>
+			<p>LNMPA Script - help you install Apache/Nginx + Mysql/MariaDB + PHP on your VPS or Dedicated Server.</p><p>It's the most powerful LNMPA script out there.</p>		</div>
+		<div class="section">
+			<h3>Below is the layout of MTEnv.</h3>
+			<pre>
+/mtimer [ALL]
+	-----log [Logs location]
+		--nginx
+		--httpd
+		--php
+		--mysql
+		--mariadb
+	-----server [All kinds of services]
+		--nginx
+			--conf [Nginx configuration files location]
+				--nginx.conf    ——     nginx configuration file
+				--rewrite       ——     rewrite configuration files location
+				--vhosts        ——     vhosts configuration files location
+				--crons         ——     cron files location
+		--httpd
+			--conf [httpd configuration files location]
+				--httpd.conf    ——     main configuration file
+				--vhosts        ——     vhosts, eg. example.com.conf
+			--conf.d            ——     other configuration files directory, mod_fastcgi.conf etc.
+			--crons             ——     cron files location
+		--php
+			--etc [PHP configuration files location]
+				--php-fpm.conf  ——     PHP-FPM configuration file
+				--php.ini       ——     PHP configuration file
+		--mysql                 ——     my.cnf located @ /etc/my.cnf
+		--mariadb
+	-----www [*Websites Directory*, containg all websites]
+		--example.com           ——     Default website root directory
+		--soft.example.com      ——     Another website root directory. 
+                                           If Nginx, Fancyindex enabled by default.
+        --dle.example.com       ——     Datalife Engine
+        --wordpress.example.com ——     Wordpress
+		--phpmyadmin            ——     phpMyAdmin, Access via http://Yourdomain:7772/
+		--adminer               ——     Adminer, Access via http://Yourdomain:7771/
+	-----tmp [pid,sock,lock files]
+			</pre>		</div>
+	</div>
+
+
+	<h2>Including</h2>
+	<div class="cont">
+		<!-- Apache -->
+		<a href="#apache" title="Server {Apache}" class="fancybox box">
+			<b>{Apache}</b>
+			Apache		</a>
+		<div id="apache" class="upCont">
+			<strong class="modalTitle">Server {Apache}</strong>
+			<div class="section">
+				<h3>Support Versions</h3>
+				<p>Apache 2.2.X</p>
+				<p>Apache 2.4.X</p>
+			</div>
+			<div class="section">
+				<h3>Apache Multi-Processing Module</h3>
+					<table class="uses">
+						<tr>
+							<td>v2.2.X</td>
+							<td>prefork - the only option</td>
+						</tr>
+						<tr>
+							<td>v2.4.X</td>
+							<td>event - default. Apache compiled with --enable-mpm-shared option, so you change mpm.</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- Nginx -->
+		<a href="#nginx" title="Server {Nginx}" class="fancybox box">
+			<b>{Nginx}</b>
+			Nginx		</a>
+		<div id="nginx" class="upCont">
+			<strong class="modalTitle">Server {Nginx}</strong>
+			<div class="section">
+				<h3>Support Versions</h3>
+				<p>Always latested stable version since there is no need to use old nginx</p>
+			</div>
+			<!--<div class="download"><a class="exLink" href="/example/nginxhelp.txt">Help!</a></div>-->
+		</div>
+
+
+		<!-- MySQL -->
+		<a href="#mysql" title="{MySQL}" class="fancybox box">
+			<b>{MySQL}</b>
+			MySQL		</a>
+		<div id="mysql" class="upCont">
+			<strong class="modalTitle">Server {MySQL}</strong>
+			<div class="section">
+				<h3>Support Versions</h3>
+				<p>v5.1.X</p>
+				<p>v5.5.X</p>
+				<p>v5.6.X</p>
+			</div>
+			<div class="section">
+				<h3>MySQL is the default option, but you can switch to MariaDB which is opensource.</h3>
+			</div>
+		</div>
+
+
+		<!-- MariaDB -->
+		<a href="#mariadb" title="{MariaDB}" class="fancybox box">
+			<b>{MariaDB}</b>
+			MariaDB		</a>
+		<div id="mariadb" class="upCont">
+			<strong class="modalTitle">Server {MariaDB}</strong>
+			<div class="section">
+				<h3>Support Versions</h3>
+					<table class="uses">
+						<tr>
+							<td>v5.3.X</td>
+							<td>same as MySQL v5.1.X</td>
+						</tr>
+						<tr>
+							<td>v5.5.X</td>
+							<td>same as MySQL v5.5.X</td>
+						</tr>
+						<tr>
+							<td>v10.0.X</td>
+							<td>same as MySQL v5.6.X</td>
+						</tr>
+					</table>
+			</div>
+			<div class="section">
+				<h3>It's almost the same as MySQL. But it's just the better option. </h3>
+			</div>
+		</div>
+
+
+		<!-- PHP -->
+		<a href="#php" title="{PHP}" class="fancybox box">
+			<b>{PHP}</b>
+			PHP		</a>
+		<div id="php" class="upCont">
+			<strong class="modalTitle">Server {PHP}</strong>
+			<div class="section">
+				<h3>Support Versions</h3>
+				<p>v5.3.X</p>
+				<p>v5.4.X</p>
+				<p>v5.5.X</p>
+				<p>v5.6.X</p>
+			</div>
+			<div class="section">
+				<h3>The way PHP works with webserver</h3>
+					<table class="uses">
+						<tr>
+							<td>PHP v5.3.X</td>
+							<td>Apache - mod_php; Nginx - PHP-FPM</td>
+						</tr>
+						<tr>
+							<td>PHP v5.4.X</td>
+							<td>PHP-FPM</td>
+						</tr>
+						<tr>
+							<td>PHP v5.5.X</td>
+							<td>PHP-FPM</td>
+						</tr>
+						<tr>
+							<td>PHP v5.6.X</td>
+							<td>PHP-FPM</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- FTP -->
+		<a href="#ftp" title="{FTP}" class="fancybox box">
+			<b>{FTP}</b>
+			FTP		</a>
+		<div id="ftp" class="upCont">
+			<strong class="modalTitle">Server {FTP}</strong>
+			<div class="section">
+				<h3>VSFTPD</h3>
+				<p>v3.0.2</p>
+			</div>
+			<div class="section">
+				<h3>Check ~/.mtenv/extra/account.log for ftp accounts</h3>
+			</div>
+		</div>
+
+
+		<!-- Dev -->
+		<a href="#developer" title="Developer" class="fancybox box">
+			<b>Developer</b>
+			Extra		</a>
+		<div id="developer" class="upCont">
+			<strong class="modalTitle">For developers</strong>
+			<div class="section">
+				<h3>It can help you install develop environment.</h3>
+					<table class="uses">
+						<tr>
+							<td>Ruby on Rails</td>
+							<td>Ruby + Puma + Builder + Redmine</td>
+						</tr>
+						<tr>
+							<td>Git</td>
+							<td>Gitolite installer</td>
+						</tr>
+						<tr>
+							<td>Python</td>
+							<td>Coming</td>
+						</tr>
+						<tr>
+							<td>Suggestions?</td>
+							<td>Contact: mtimercms@hotmail.com</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- Control -->
+		<a href="#control" title="Control" class="fancybox box">
+			<b>Control</b>
+			PHP		</a>
+		<div id="control" class="upCont">
+			<strong class="modalTitle">Control Servers</strong>
+			<div class="section">
+				<h3>It's easy.</h3>
+					<table class="uses">
+						<tr>
+							<td>Apache</td>
+							<td>service httpd (start | stop | reload | restart)</td>
+						</tr>
+						<tr>
+							<td>Nginx</td>
+							<td>service nginx (start | stop | reload | restart)</td>
+						</tr>
+						<tr>
+							<td>MySQL/MariaDB</td>
+							<td>service mysql (start | stop | reload | restart)</td>
+						</tr>
+						<tr>
+							<td>PHP</td>
+							<td>mod_php: same as Apache.  PHP-FPM: service php-fpm (start | stop | reload | restart)</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- License -->
+		<a href="#license" title="License" class="fancybox box">
+			<b>License</b>
+			License		</a>
+		<div id="license" class="upCont">
+			<strong class="modalTitle">Script License</strong>
+			<div class="section">
+				<h3>Copyright (C) <2014>  &lt;MTimer&gt; (http://www.mtimer.cn)</h3>
+					<pre>
+
+    This software is not free. Buy a license @ www.mtimer.cn. You will get fully-functional MTEnv, lifetime free support and updates.
+
+					</pre>
+			</div>
+		</div>
+
+
+		<!-- More -->
+		<a href="#contentScroll" class="anchor box">
+			<b>Do you like it?</b>
+					</a>
+	</div>
+
+	</section>
+
+
+	<h1><span>Credits<a href="#otherInfo" title="Thanks to all" class="about fancybox"></a></span></h1>
+	<div id="otherInfo" class="upCont">
+		<strong class="modalTitle">Credits</strong>
+		<div class="section">
+				<h3>Thanks to all.</h3>
+					<table class="uses">
+						<tr>
+							<td>Aliyun LNMP</td>
+							<td>aliyun.com</td>
+						</tr>
+						<tr>
+							<td>LNMP 1.0</td>
+							<td>lnmp.org</td>
+						</tr>
+						<tr>
+							<td>Extreme lnmpv 0.4 preview</td>
+							<td>yzs.me</td>
+						</tr>
+						<tr>
+							<td>centmin-v1.2.3</td>
+							<td>centminmod.com</td>
+						</tr>
+						<tr>
+							<td>WangYan lanmp</td>
+							<td>github.com/wangyan/lanmp</td>
+						</tr>
+						<tr>
+							<td>Minstall</td>
+							<td>github.com/maxexcloo/Minstall</td>
+						</tr>
+						<tr>
+							<td>DirectAdmin</td>
+							<td>directadmin.com</td>
+						</tr>
+					</table>
+		</div>
+	</div>
+
+
+	</div>
+
+	<div id="contentScroll" class="testTemplate">
+		<a class="testLink" href="http://www.mtimer.cn/">Buy a license from MTimer</a>
+		<p><span class="vers">You will get fully functional MTEnv. Lifetime free support & updates</span></p>
+		<a class="fancybox" href="#test">Need help?</a>
+		<div id="test" class="upCont">
+		<p>Skype: mtimercms@hotmail.com</p>
+		<p>Pay: </p>
+		      <p>[Paypal/Payza] paypal@mtimer.cn</p>
+		      <p>[Webmoney] Z369907552397</p>
+		</div>
+	</div>
+
+<footer>BY MTimer — <a href="mailto:mtimercms@hotmail.com">mtimercms@hotmail.com</a>
+<a rel="nofollow" target="_blank" class="sourse" href="http://www.mtimer.cn/">Source</a>
+</footer>
+
+
+<!-- SCRIPTS -->
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+<script>window.jQuery || document.write('<script src="js/jquery-1.10.2.min.js"><\/script>')</script>
+
+<script src="js/mod.js"></script>
+<script type="text/javascript">
+$(function(){ 
+	$('.cont').masonry({
+		itemSelector: '.box',
+		singleMode: false,
+		isResizable: true,
+		isAnimated: true,
+		animationOptions: { 
+				queue: false, 
+				duration: 500 
+		}
+	}); 
+
+	// Scroll
+	$('a.anchor').bind("click", function(e){
+		var anchor = $(this);
+		var name = anchor.attr('href').replace(new RegExp("#",'gi'), '');
+		$('html, body').stop().animate({
+			scrollTop: $('a[name='+name+']').offset().top
+		}, 1000);
+
+		e.preventDefault();
+		return false;
+	});
+
+	// Hash show
+	$("a.fancybox").filter('.box').click(function() {
+		var hashChange = $(this).attr("href");
+		window.location.hash = hashChange;
+	});
+
+	// fastAnchor
+	var fastAnchor = window.location.hash;
+	if (fastAnchor){	$('a[href$='+fastAnchor+']').filter('.fancybox').fancybox({ openEffect: 'elastic',helpers: { title : null } }).eq(0).trigger('click');	}
+
+	// fancybox
+	$('.fancybox').fancybox({
+		openEffect: 'elastic',
+		helpers: { title : null },
+		afterClose : function() {
+			//clear hash
+			history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
+	});
+});
+</script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

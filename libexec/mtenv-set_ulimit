@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+set_ulimit_Install()
+{
+	[ -z "MTENV_V" ] && [ -e /etc/security/limits.conf.old ] && echo -e "Done\a\n" && exit 1
+	cp -f /etc/security/limits.conf /etc/security/limits.conf.old
+	cat >> /etc/security/limits.conf <<-EOF
+	* soft nproc 65535
+	* hard nproc 65535
+	* soft nofile 65535
+	* hard nofile 65535
+	EOF
+}
+
+set_ulimit_Uninstall()
+{
+	mv -f /etc/security/limits.conf.old /etc/security/limits.conf
+}
+
+command="$1"
+case "$command" in
+	"Install" | "Uninstall" )
+		[ -z "$MTENV_V" ] && exec mtenv help set_ulimit
+		set_ulimit_$command
+		;;
+	* )
+		exec mtenv help set_ulimit
+		;;
+esac

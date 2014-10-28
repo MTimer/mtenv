@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+soft_TzInstall()
+{
+	Downloadfile PHP-TZ/tz.zip
+	cp tz.php /mtimer/www/${dle_dir}/
+}
+
+soft_PhpmyadminInstall()
+{
+	iptables -I INPUT -p tcp --dport 7772 -j ACCEPT
+	Downloadfile phpMyAdmin/${phpmyadmin_dir}.zip
+	cp -Rf ${MUNPACKED_PATH}/${phpmyadmin_dir}/* /mtimer/www/phpmyadmin/
+	sed -i "2 s/^/exit;/" /mtimer/www/phpmyadmin/version_check.php
+	chown www:www -R /mtimer/www/phpmyadmin/
+}
+
+soft_AdminerInstall()
+{
+	iptables -I INPUT -p tcp --dport 7771 -j ACCEPT
+	Downloadfile adminer/${adminer_dir}.zip
+	cp -f ${MUNPACKED_PATH}/${adminer_dir}/${adminer_dir}.php /mtimer/www/adminer/index.php
+	chown www:www -R /mtimer/www/
+}
+
+soft_DleInstall()
+{
+	# 安装 DLE
+	Downloadfile program/dle/${dle_dir}.zip
+
+	mv -f ${MUNPACKED_PATH}/${dle_dir}/upload/* /mtimer/www/${dle_dir}/
+	chown -R www:www /mtimer/www/${dle_dir}/
+
+	#这一部分是开机启动Nodechat聊天模块，一般用户不需要
+	#if [ -d /mtimer/wwww/${dle_dir}/nodechat ]; then
+	#	cp nodechat /etc/init.d/
+	#	sed -i "s#www/dle#www/${dle_dir}#g" /etc/init.d/nodechat
+	#	chmod +x /etc/init.d/nodechat
+	#	DoInit add nodechat
+	#	service nodechat start
+	#fi
+}
+
+soft_WordpressInstall()
+{
+	# 安装 Wordpress
+	Downloadfile program/wordpress/${wp_dir}.tar.gz wordpress
+	mv -f ${MUNPACKED_PATH}/wordpress/* /mtimer/www/${wp_dir}/
+	chown -R www:www /mtimer/www/${wp_dir}/
+}
+
+soft_MemcachedStart()
+{
+	userdel nobody || true
+	groupdel nobody || true
+	useradd -c "Nobody" -d / -s /sbin/nologin nobody
+	# 启动 Memcached server
+	cp ${MINIT_PATH}/${DETECT_OS}/memcached /etc/init.d/
+	chmod +x /etc/init.d/memcached
+	mkdir -p /etc/memcached/pidfiles
+	chown nobody:nobody /etc/memcached/pidfiles
+	cp -f ${MCONF_PATH}/memcached/* /etc/memcached/
+	DoInit add memcached
+	service memcached start
+}
+
+soft_PamInstall()
+{
+	Downloadfile other/${pam_dir}.tar.bz2 --skip
+	tar -xf ${MPACKAGES_PATH}/${pam_dir}.tar.bz2 -C ${MUNPACKED_PATH} --strip-components=1
+	cd ${MUNPACKED_PATH}/${pam_dir}
+	./configure --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib --enable-securedir=/lib/security --docdir=/usr/share/doc/${pam_dir}
+	make
+	if [ ! -d /etc/pam.d ]; then
+		install -v -m755 -d /etc/pam.d
+		cat > /etc/pam.d/other <<-EOF
+		auth     required       pam_deny.so
+		account  required       pam_deny.so
+		password required       pam_deny.so
+		session  required       pam_deny.so
+		EOF
+	fi
+	make check
+	rm -rfv /etc/pam.d
+	make install
+	chmod -v 4755 /sbin/unix_chkpwd
+	for file in pam pam_misc pamc
+	do
+	  mv -v /usr/lib/lib${file}.so.* /lib &&
+	  ln -sfv ../../lib/$(readlink /usr/lib/lib${file}.so) /usr/lib/lib${file}.so
+	done
+}
+
+soft_VsftpdInstall()
+{
+	Downloadfile ftp/vsftpd/${vsftpd_dir}.tar.gz
+	install -v -d -m 0755 /mtimer/ftp
+	install -v -d -m 0755 /mtimer/ftp/ftp1
+	userdel ftp || true
+	userdel vsftpd || true
+	useradd -c "vsftpd User" -d /dev/null -s /sbin/nologin vsftpd
+	useradd -c "ftp user" -d /mtimer/ftp -s /sbin/nologin ftp
+
+	sed -i -e 's|#define VSF_SYSDEP_HAVE_LIBCAP|//&|' sysdeputil.c
+	echo "#define VSF_BUILD_TCPWRAPPERS" >> builddefs.h
+	echo "#define VSF_BUILD_SSL" >> builddefs.h
+
+	patch sysdeputil.c ${MEXTRA_PATH}/${vsftpd_dir}.patch
+	
+	make
+
+	mkdir -p /etc/vsftpd/user_config/
+	mkdir -p /etc/vsftpd/empty/
+
+	install -v -m 755 vsftpd /usr/sbin/vsftpd
+	install -v -m 644 vsftpd.8 /usr/share/man/man8
+	install -v -m 644 vsftpd.conf.5 /usr/share/man/man5
+
+	cp -f ${MCONF_PATH}/ftp/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf
+	cp -f ${MCONF_PATH}/ftp/vsftpd/vsftpd.pam.${DETECT_OS} /etc/pam.d/vsftpd
+
+	if [ "$machine" = "x86_64" ]; then
+		case "$DETECT_OS" in
+			"centos" )
+				sed -i "s#/lib#/lib64#" /etc/pam.d/vsftpd
+				;;
+			"debian" | "ubuntu" )
+				sed -i "s#/i386#/x86_64#" /etc/pam.d/vsftpd
+				;;
+		esac
+	fi
+	
+	cp -f ${MCONF_PATH}/ftp/vsftpd/user.tmp /etc/vsftpd/user.tmp
+	cp -f ${MCONF_PATH}/ftp/vsftpd/ftpusers /etc/vsftpd/ftpusers
+	touch /etc/vsftpd/user_list
+	touch /etc/vsftpd/chroot_list || true
+	touch /var/log/vsftpd.log || true
+
+	chown -R ftp:ftp /mtimer/ftp
+	cp /etc/vsftpd/user.tmp /etc/vsftpd/user_config/ftp1
+
+	cp -f ${MINIT_PATH}/${DETECT_OS}/vsftpd /etc/init.d/
+	chmod +x /etc/init.d/vsftpd
+	DoInit add vsftpd
+
+	iptables -I INPUT -p tcp --dport 20 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 21 -j ACCEPT
+	iptables -I INPUT -s 192.168.0.0/16 -p tcp --dport 30000:30999 -j ACCEPT
+	#echo $FtpPass | passwd --stdin ftp
+}
+
+soft_Install()
+{
+	if [ "$MSQLTYPE" = "phpmyadmin" ]; then
+		soft_PhpmyadminInstall
+	else
+		soft_AdminerInstall
+	fi
+	soft_DleInstall
+	soft_WordpressInstall
+	soft_MemcachedStart
+	soft_VsftpdInstall
+	service ${WEBTYPE} restart
+}
+
+command="$1"
+case "$command" in
+	"Install" | "Uninstall" | "Upgrade" )
+		[ -z "$MTENV_V" ] && exec mtenv help soft
+		soft_$command
+		;;
+	* )
+		exec mtenv help soft
+		;;
+esac

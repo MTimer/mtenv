@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+centos_UpdateSource()
+{
+	OS_VER=$(cat /etc/redhat-release | cut -d\  -f5)
+	if [ "$OS_VER" = "release" ]; then
+		OS_VER=$(cat /etc/redhat-release | cut -d\  -f6)
+	elif [ "$OS_VER" = "ES" ]; then
+		OS_VER=$(cat /etc/redhat-release | cut -d\  -f7)
+	elif [ "$OS_VER" = "WS" ]; then
+		OS_VER=$(cat /etc/redhat-release | cut -d\  -f7)
+	elif [ "$OS_VER" = "AS" ]; then
+		OS_VER=$(cat /etc/redhat-release | cut -d\  -f7)
+	elif [ "$OS_VER" = "Server" ]; then
+		OS_VER=$(cat /etc/redhat-release | cut -d\  -f7)
+	elif [ "$(cat /etc/redhat-release 2>/dev/null| cut -d\  -f1)" = "CentOS" ]; then
+		OS_VER=$(cat /etc/redhat-release |cut -d\  -f3);
+		if [ "$OS_VER" = "release" ]; then
+			OS_VER=$(cat /etc/redhat-release | cut -d\  -f4)
+		fi
+	elif [ "$(cat /etc/redhat-release 2>/dev/null| cut -d\  -f3)" = "Enterprise" ]; then
+		OS_VER=$(cat /etc/redhat-release 2>/dev/null| cut -d\  -f7)
+	elif [ "$(cat /etc/redhat-release 2>/dev/null| cut -d\  -f1)" = "CloudLinux" ]; then
+		OS_VER=$(cat /etc/redhat-release 2>/dev/null| cut -d\  -f4)
+	fi
+	OS_VER=$(echo $OS_VER | awk '{print substr($1,1,1)}')
+
+	yum clean all
+
+	if [ "$OS_VER" = "6" ] && [ "$WHERE" = "china" ]; then
+		wget -c --tries=3 http://mirrors.ustc.edu.cn/epel/6/${machine}/epel-release-6-8.noarch.rpm
+		#wget -c --tries=3 http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+		rpm -ivh epel-release-6-8.noarch.rpm
+		#rpm -ivh remi-release-6.rpm
+		rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL || true
+		rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6 || true
+		#rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-remi || true
+		mv -f /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+		cp ${MEXTRA_PATH}/CentOS-Base.repo-6 /etc/yum.repos.d/CentOS-Base.repo
+	elif [ "$OS_VER" = "5" ] && [ "$WHERE" = "china" ]; then
+		wget -c --tries=3 http://mirrors.ustc.edu.cn/epel/5/${machine}/epel-release-5-4.noarch.rpm
+		#wget -c --tries=3 http://rpms.famillecollet.com/enterprise/remi-release-5.rpm
+		rpm -ivh epel-release-5-4.noarch.rpm
+		#rpm -ivh remi-release-5.rpm
+		rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL || true
+		rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-5 || true
+		#rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-remi || true
+		mv -f /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+		cp ${MEXTRA_PATH}/CentOS-Base.repo-5 /etc/yum.repos.d/CentOS-Base.repo
+	fi
+
+	# rpmforge 源，用不到
+	#if [ "$machine" = "i386" ]; then
+	#	machine=i686
+	#fi
+	#rpm -Uvh http://mirror.bjtu.edu.cn/repoforge/redhat/el6/en/${machine}/rpmforge/RPMS/rpmforge-release-0.5.2-2.el6.rf.${machine}.rpm
+	#rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-rpmforge-dag
+
+	yum clean metadata
+	yum makecache
+}
+
+centos_TimeZone()
+{
+	# 设置时区
+	rm -rf /etc/localtime
+	ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+	yum install -y ntp
+	ntpdate -u pool.ntp.org
+	date
+	if [ ! $(grep -l 'disable monitor'    '/etc/ld.so.conf') ]; then
+		echo 'disable monitor' >> /etc/ntp.conf
+	fi
+	service ntpd restart
+}
+
+centos_PreInstall()
+{
+	# 必要的准备
+	vi_path=$(command -v vi)
+	mv -f ${vi_path} ${vi_path}-old
+	vim_path="$(command -v vim || true)"
+	if [ -z "$vim_path" ]; then
+		apt-get install -y vim
+	fi
+	ln -vs $(command -v vim) ${vi_path}
+	if [ -s /etc/selinux/config ]; then
+		sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+		setenforce 0 || true
+	fi
+}
+
+centos_Upgrade()
+{
+	cp -f /etc/yum.conf /etc/yum.conf.old
+	sed -i 's/^exclude/#exclude/' /etc/yum.conf
+	yum -y install patch make gcc gcc-c++ flex file zip unzip bzip2 bzip2-devel xz nano m4 perl perl-devel perl-ExtUtils-MakeMaker perl-CPAN kernel-devel glib2 glib2-devel ncurses ncurses-devel libidn libidn-devel libcap libcap-devel xmlto gmp gmp-devel sqlite man tcp_wrappers tcp_wrappers-devel pam pam-devel krb5-devel db4-utils
+	mv -f /etc/yum.conf.old /etc/yum.conf
+}
+
+centos_EnvInstall()
+{
+	centos_UpdateSource
+	centos_TimeZone
+	centos_PreInstall
+	centos_Upgrade
+
+	yum -y install automake libtool libtool-ltdl-devel libtool-ltdl libxml2 libxml2-devel tcl tk gettext gettext-devel e2fsprogs e2fsprogs-devel cpio expat-devel
+
+
+	#iflinode=$(cat /proc/version | grep -i debian)
+	########Fix LINODE########
+	#if [ "$iflinode" != "" ];then
+	#cp /etc/init.d/iptables /etc/init.d/iptables.backup
+	#patch -p1 < ${MEXTRA_PATH}/14857.txt \/etc/init.d/iptables
+	#fi
+
+	# 关闭防火墙
+	#/etc/init.d/iptables stop
+	#/etc/init.d/ip6tables stop
+	#chkconfig iptables off
+	#chkconfig ip6tables off
+}
+
+command="$1"
+case "$command" in
+	"EnvInstall" | "Upgrade" )
+		[ -z "$MTENV_V" ] && exec mtenv help centos
+		centos_$command
+		;;
+	* )
+		exec mtenv help centos
+		;;
+esac

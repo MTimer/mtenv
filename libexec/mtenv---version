@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Summary: Display the version of mtenv
+#
+# Displays the version number of this mtenv release.
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+version="20141028"
+
+echo -e "mtenv-$version\n"

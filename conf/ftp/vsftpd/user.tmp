@@ -1,0 +1,4 @@
+local_root=/mtimer/ftp/ftp1
+max_clients=10
+max_per_ip=5
+local_max_rate=500000

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+ftp_Adduser()
+{
+
+}
+
+ftp_Deleteuser()
+{
+
+}
+
+command="$1"
+case "$command" in
+	"Adduser" | "Deleteuser" )
+		[ -z "$MTENV_V" ] && exec mtenv help ftp
+		ftp_$command
+		;;
+	* )
+		exec mtenv help ftp
+		;;
+esac

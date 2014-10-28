@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+dir_CreateDir()
+{
+	mkdir /mtimer
+	mkdir -p /mtimer/tmp/vsftpd
+	chmod -R 777 /mtimer/tmp
+	mkdir /mtimer/server
+	mkdir /mtimer/www
+	mkdir /mtimer/www/${dle_dir}
+	mkdir /mtimer/www/${wp_dir}
+	mkdir /mtimer/www/${MSQLTYPE}
+
+	mkdir /mtimer/www/example.com
+	mkdir /mtimer/www/soft.example.com
+}
+
+dir_CreateUsers()
+{
+	# 新建用户 www,mysql
+	groupadd www
+	useradd -s /sbin/nologin -M -g www -d /mtimer/www  www
+	groupadd mysql
+	useradd -s /sbin/nologin -M -g mysql mysql
+}
+
+dir_CreateVhosts()
+{
+	cat >>/mtimer/www/${dle_dir}/phpinfo.php<<-EOF
+	<?php
+	phpinfo();
+	?>
+	EOF
+
+	cp -Rf ${MDOCS_PATH}/* /mtimer/www/example.com
+
+	cat >>/mtimer/www/example.com/phpinfo.php<<-EOF
+	<?php
+	phpinfo();
+	?>
+	EOF
+
+	chmod -R 775 /mtimer/www
+	chown -R www:www /mtimer/www
+	mkdir /mtimer/log
+	mkdir /mtimer/log/ftp
+	mkdir /mtimer/log/php
+	mkdir /mtimer/log/${SQLTYPE}
+	touch /mtimer/log/${SQLTYPE}/${SQLTYPE}_slow.log
+	chown mysql:mysql /mtimer/log/${SQLTYPE}/${SQLTYPE}_slow.log
+	mkdir /mtimer/log/${WEBTYPE}
+	chown -R www:www /mtimer/log
+
+	mkdir /mtimer/server/${sql_dir}
+	ln -vs /mtimer/server/${sql_dir} /mtimer/server/${SQLTYPE}
+
+	mkdir /mtimer/server/${php_dir}
+	ln -vs /mtimer/server/${php_dir} /mtimer/server/php
+
+
+	if [ "$WEBTYPE" = "httpd" ]; then
+		mkdir /mtimer/server/${apache_dir}
+		ln -vs /mtimer/server/${apache_dir} /mtimer/server/httpd
+	else
+		mkdir /mtimer/server/${nginx_dir}
+		ln -vs /mtimer/server/${nginx_dir} /mtimer/server/nginx
+	fi
+}
+
+dir_Install()
+{
+	dir_CreateDir
+	dir_CreateUsers
+	dir_CreateVhosts
+}
+
+command="$1"
+case "$command" in
+	"Install" )
+		[ -z "$MTENV_V" ] && exec mtenv help dir
+		dir_$command
+		;;
+	* )
+		exec mtenv help dir
+		;;
+esac

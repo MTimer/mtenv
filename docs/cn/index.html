@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!--[if lt IE 9]><script type="text/javascript" src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+<title>MTEnv - LNMPA 服务器简约管理工具 [Apache/Nginx|MySQL/MaridDB|PHP]</title>
+<meta charset="utf-8" />
+<meta name="keywords" content="mtenv, lnmp, lnmpa, lamp, Apache, Nginx, MySQL, MariaDB, PHP, Linux, LAMP script, LNMP script, LNMPA 一键安装脚本" />
+<meta name="description" content="MTEnv - LNMPA 服务器简约管理工具 [Apache-Nginx|MySQL-MaridDB|PHP]" />
+
+<!--<link href='http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700&amp;subset=latin' rel='stylesheet' type='text/css' />-->
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="../css/mod.css" />
+</head>
+
+
+<body>
+<header>
+<div class="headerCore">
+	<h1 class="logo"><strong>MTEnv</strong> <span>—</span> LNMPA 服务器 简约管理工具 <a href="http://www.mtimer.cn/" target="_blank">演示</a></h1> 
+
+	<div class="yashare-auto-init"></div> 
+
+	<div title="MTEnv Version and Help" class="MTEnvVer">20141028</div>
+	<a class="changes fancybox fancybox.ajax" href="http://api.mtimer.cn/mtenv/ver.php">更新</a>
+</div>
+</header>
+
+
+
+<div id="wrapper">
+	<div id="content">
+		<section>
+	<h1><span>MTEnv<a href="#mainInfo" title="MTEnv 家族" class="about fancybox"></a></span></h1>
+	<div id="mainInfo" class="upCont">
+		<strong class="modalTitle">MTEnv</strong>
+		<div class="section">
+			<h3>什么是 MTEnv?</h3>
+			<p>LNMPA 服务器管理脚本 - 帮助你快速 Apache/Nginx + Mysql/MariaDB + PHP 和开发环境。</p></div>
+		<div class="section">
+			<h3>下面是 MTEnv 的布局</h3>
+			<pre>
+/mtimer [总目录]
+	-----log [日志目录]
+		--nginx
+		--httpd
+		--php
+		--mysql
+		--mariadb
+	-----server [各种 服务]
+		--nginx
+			--conf [Nginx 配置文件目录]
+				--nginx.conf    ——     nginx 主配置文件
+				--rewrite       ——     子网站rewrite规则文件目录
+				--vhosts        ——     子网站配置文件目录
+				--crons         ——     定时任务脚本目录
+		--httpd
+			--conf [httpd 配置文件目录]
+				--httpd.conf    ——     apache 主配置文件
+				--vhosts        ——     网站配置文件目录，比如 example.com.conf
+			--conf.d            ——     各种其他配置文件，比如 mod_fastcgi.conf
+			--crons             ——     定时任务脚本目录
+		--php
+			--etc [PHP 相关配置文件目录]
+				--php-fpm.conf  ——     PHP-FPM 配置文件
+				--php.ini       ——     PHP 配置文件
+		--mysql                 ——     my.cnf 在 /etc/my.cnf
+		--mariadb
+	-----www [*网站主目录*，子网站存放在每个子目录]
+		--example.com           ——     网站公开目录
+		--soft.example.com      ——     子网站目录，如果装的是 Nginx, 这个目录默认开启 Fancyindex
+        --dle.example.com       ——     Datalife Engine
+        --wordpress.example.com ——     Wordpress
+		--phpmyadmin            ——     phpMyAdmin 目录，使用 http://你的域名:7772/访问
+		--adminer               ——     Adminer 目录，使用 http://你的域名:7771/访问
+			</pre>		</div>
+	</div>
+
+
+	<h2>Including</h2>
+	<div class="cont">
+		<!-- Apache -->
+		<a href="#apache" title="Server {Apache}" class="fancybox box">
+			<b>{Apache}</b>
+			Apache		</a>
+		<div id="apache" class="upCont">
+			<strong class="modalTitle">{Apache} 服务</strong>
+			<div class="section">
+				<h3>可选版本</h3>
+				<p>Apache 2.2.X</p>
+				<p>Apache 2.4.X</p>
+			</div>
+			<div class="section">
+				<h3>Apache 多任务处理模块 MPM</h3>
+					<table class="uses">
+						<tr>
+							<td>v2.2.X</td>
+							<td>prefork - 唯一选项</td>
+						</tr>
+						<tr>
+							<td>v2.4.X</td>
+							<td>event - 默认。 Apache 编译了选项 --enable-mpm-shared, 你可以动态加载其他 MPM。</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- Nginx -->
+		<a href="#nginx" title="Server {Nginx}" class="fancybox box">
+			<b>{Nginx}</b>
+			Nginx		</a>
+		<div id="nginx" class="upCont">
+			<strong class="modalTitle">{Nginx} 服务</strong>
+			<div class="section">
+				<h3>可选版本</h3>
+				<p>始终最新稳定版本，因为你没必要用老版本的 Nginx。</p>
+			</div>
+			<!--<div class="download"><a class="exLink" href="/example/nginxhelp.txt">Help!</a></div>-->
+		</div>
+
+
+		<!-- MySQL -->
+		<a href="#mysql" title="{MySQL}" class="fancybox box">
+			<b>{MySQL}</b>
+			MySQL		</a>
+		<div id="mysql" class="upCont">
+			<strong class="modalTitle">{MySQL} 服务</strong>
+			<div class="section">
+				<h3>可选版本</h3>
+				<p>v5.1.X</p>
+				<p>v5.5.X</p>
+				<p>v5.6.X</p>
+			</div>
+			<div class="section">
+				<h3>MySQL 是默认安装的, 但是你可以选择 MariaDB 分支，开源更强大。</h3>
+			</div>
+		</div>
+
+
+		<!-- MariaDB -->
+		<a href="#mariadb" title="{MariaDB}" class="fancybox box">
+			<b>{MariaDB}</b>
+			MariaDB		</a>
+		<div id="mariadb" class="upCont">
+			<strong class="modalTitle">{MariaDB} 服务</strong>
+			<div class="section">
+				<h3>可选版本</h3>
+					<table class="uses">
+						<tr>
+							<td>v5.3.X</td>
+							<td>和 MySQL v5.1.X 一样</td>
+						</tr>
+						<tr>
+							<td>v5.5.X</td>
+							<td>和 MySQL v5.5.X 一样</td>
+						</tr>
+						<tr>
+							<td>v10.0.X</td>
+							<td>和 MySQL v5.6.X 一样</td>
+						</tr>
+					</table>
+			</div>
+			<div class="section">
+				<h3>和 MySQL 差不多，但是开源而且是更好的选择。</h3>
+			</div>
+		</div>
+
+
+		<!-- PHP -->
+		<a href="#php" title="{PHP}" class="fancybox box">
+			<b>{PHP}</b>
+			PHP		</a>
+		<div id="php" class="upCont">
+			<strong class="modalTitle">{PHP} 服务</strong>
+			<div class="section">
+				<h3>可选版本</h3>
+				<p>v5.3.X</p>
+				<p>v5.4.X</p>
+				<p>v5.5.X</p>
+				<p>v5.6.X</p>
+			</div>
+			<div class="section">
+				<h3>PHP 和 Apache/Nginx 交互方式</h3>
+					<table class="uses">
+						<tr>
+							<td>PHP v5.3.X</td>
+							<td>Apache - mod_php; Nginx - PHP-FPM</td>
+						</tr>
+						<tr>
+							<td>PHP v5.4.X</td>
+							<td>PHP-FPM</td>
+						</tr>
+						<tr>
+							<td>PHP v5.5.X</td>
+							<td>PHP-FPM</td>
+						</tr>
+						<tr>
+							<td>PHP v5.6.X</td>
+							<td>PHP-FPM</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- FTP -->
+		<a href="#ftp" title="{FTP}" class="fancybox box">
+			<b>{FTP}</b>
+			FTP		</a>
+		<div id="ftp" class="upCont">
+			<strong class="modalTitle">{FTP} 服务</strong>
+			<div class="section">
+				<h3>默认 VSFTPD</h3>
+				<p>v3.0.2</p>
+			</div>
+			<div class="section">
+				<h3>ftp账号在 ~/.mtenv/extra/account.log</h3>
+			</div>
+		</div>
+
+
+		<!-- Dev -->
+		<a href="#developer" title="Developer" class="fancybox box">
+			<b>开发者</b>
+			高级功能		</a>
+		<div id="developer" class="upCont">
+			<strong class="modalTitle">开发功能</strong>
+			<div class="section">
+				<h3>帮助你快速建立开发环境.</h3>
+					<table class="uses">
+						<tr>
+							<td>Ruby on Rails</td>
+							<td>Ruby + Puma + Builder + Redmine</td>
+						</tr>
+						<tr>
+							<td>Git</td>
+							<td>Gitolite installer</td>
+						</tr>
+						<tr>
+							<td>Python</td>
+							<td>Coming</td>
+						</tr>
+						<tr>
+							<td>建议?</td>
+							<td>联系: mtimercms@hotmail.com</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- Control -->
+		<a href="#control" title="Control" class="fancybox box">
+			<b>控制</b>
+			PHP		</a>
+		<div id="control" class="upCont">
+			<strong class="modalTitle">控制服务器</strong>
+			<div class="section">
+				<h3>相当简单。.</h3>
+					<table class="uses">
+						<tr>
+							<td>Apache</td>
+							<td>service httpd (start | stop | reload | restart)</td>
+						</tr>
+						<tr>
+							<td>Nginx</td>
+							<td>service nginx (start | stop | reload | restart)</td>
+						</tr>
+						<tr>
+							<td>MySQL/MariaDB</td>
+							<td>service mysql (start | stop | reload | restart)</td>
+						</tr>
+						<tr>
+							<td>PHP</td>
+							<td>mod_php: 和 Apache 一样.  PHP-FPM: service php-fpm (start | stop | reload | restart)</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+
+
+		<!-- License -->
+		<a href="#license" title="License" class="fancybox box">
+			<b>版权</b>
+			版权		</a>
+		<div id="license" class="upCont">
+			<strong class="modalTitle">程序版权</strong>
+			<div class="section">
+				<h3>Copyright (C) <2014>  &lt;MTimer&gt; (http://www.mtimer.cn)</h3>
+					<pre>
+
+    此软件不免费。购买授权码 www.mtimer.cn, 以获取高级功能, 终身技术支持等。
+
+					</pre>
+			</div>
+		</div>
+
+
+		<!-- More -->
+		<a href="#contentScroll" class="anchor box">
+			<b>你喜欢吗?</b>
+					</a>
+	</div>
+
+	</section>
+
+
+	<h1><span>感谢<a href="#otherInfo" title="Thanks to all" class="about fancybox"></a></span></h1>
+	<div id="otherInfo" class="upCont">
+		<strong class="modalTitle">感谢</strong>
+		<div class="section">
+				<h3>借鉴名单.</h3>
+					<table class="uses">
+						<tr>
+							<td>Aliyun LNMP</td>
+							<td>aliyun.com</td>
+						</tr>
+						<tr>
+							<td>LNMP 1.0</td>
+							<td>lnmp.org</td>
+						</tr>
+						<tr>
+							<td>Extreme lnmpv 0.4 preview</td>
+							<td>yzs.me</td>
+						</tr>
+						<tr>
+							<td>centmin-v1.2.3</td>
+							<td>centminmod.com</td>
+						</tr>
+						<tr>
+							<td>WangYan lanmp</td>
+							<td>github.com/wangyan/lanmp</td>
+						</tr>
+						<tr>
+							<td>Minstall</td>
+							<td>github.com/maxexcloo/Minstall</td>
+						</tr>
+						<tr>
+							<td>DirectAdmin</td>
+							<td>directadmin.com</td>
+						</tr>
+					</table>
+		</div>
+	</div>
+
+
+	</div>
+
+	<div id="contentScroll" class="testTemplate">
+		<a class="testLink" href="http://www.mtimer.cn/">从 MTimer 购买授权</a>
+		<p><span class="vers">你会获得 MTEnv 高级功能。终身免费技术支持。</span></p>
+		<a class="fancybox" href="#test">需要帮助?</a>
+		<div id="test" class="upCont">
+		<p>Skype: mtimercms@hotmail.com</p>
+		<p>支付: </p>
+		      <p>[Paypal/Payza] paypal@mtimer.cn</p>
+		      <p>[Webmoney] Z369907552397</p>
+		</div>
+	</div>
+
+<footer>作者 MTimer — <a href="mailto:mtimercms@hotmail.com">mtimercms@hotmail.com</a>
+<a rel="nofollow" target="_blank" class="sourse" href="http://www.mtimer.cn/">来源</a>
+</footer>
+
+
+<!-- SCRIPTS -->
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+<script>window.jQuery || document.write('<script src="../js/jquery-1.10.2.min.js"><\/script>')</script>
+
+<script src="../js/mod.js"></script>
+<script type="text/javascript">
+$(function(){ 
+	$('.cont').masonry({
+		itemSelector: '.box',
+		singleMode: false,
+		isResizable: true,
+		isAnimated: true,
+		animationOptions: { 
+				queue: false, 
+				duration: 500 
+		}
+	}); 
+
+	// Scroll
+	$('a.anchor').bind("click", function(e){
+		var anchor = $(this);
+		var name = anchor.attr('href').replace(new RegExp("#",'gi'), '');
+		$('html, body').stop().animate({
+			scrollTop: $('a[name='+name+']').offset().top
+		}, 1000);
+
+		e.preventDefault();
+		return false;
+	});
+
+	// Hash show
+	$("a.fancybox").filter('.box').click(function() {
+		var hashChange = $(this).attr("href");
+		window.location.hash = hashChange;
+	});
+
+	// fastAnchor
+	var fastAnchor = window.location.hash;
+	if (fastAnchor){	$('a[href$='+fastAnchor+']').filter('.fancybox').fancybox({ openEffect: 'elastic',helpers: { title : null } }).eq(0).trigger('click');	}
+
+	// fancybox
+	$('.fancybox').fancybox({
+		openEffect: 'elastic',
+		helpers: { title : null },
+		afterClose : function() {
+			//clear hash
+			history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
+	});
+});
+</script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+debian_UpdateSource()
+{
+	cp -fp /etc/apt/sources.list /etc/apt/sources.list.back
+
+	cat > /etc/apt/sources.list <<-EOF
+	#ustc.edu.cn
+	deb http://mirrors.ustc.edu.cn/debian stable main contrib non-free
+	deb-src http://mirrors.ustc.edu.cn/debian stable main contrib non-free
+	deb http://mirrors.ustc.edu.cn/debian stable-proposed-updates main contrib non-free
+	deb-src http://mirrors.ustc.edu.cn/debian stable-proposed-updates main contrib non-free
+	deb http://mirrors.ustc.edu.cn/debian stable-updates main contrib non-free
+	deb-src http://mirrors.ustc.edu.cn/debian stable-updates main contrib non-free
+	EOF
+	
+	apt-get update
+}
+
+debian_TimeZone()
+{
+	# 设置时区
+	rm -rf /etc/localtime
+	ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+	apt-get install -y ntp ntpdate
+	ntpdate -u pool.ntp.org
+	date
+	if [ ! $(grep -l 'disable monitor'    '/etc/ld.so.conf') ]; then
+		echo 'disable monitor' >> /etc/ntp.conf
+	fi
+	service ntp restart
+}
+debian_PreInstall()
+{
+	# 必要的准备
+	vi_path=$(command -v vi)
+	mv -f ${vi_path} ${vi_path}-old
+	vim_path="$(command -v vim || true)"
+	if [ -z "$vim_path" ]; then
+		apt-get install -y vim
+	fi
+	ln -vs $(command -v vim) ${vi_path}
+	if [ -s /etc/selinux/config ]; then
+		sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+		setenforce 0 || true
+	fi
+}
+
+debian_Upgrade()
+{
+	apt-get install -y patch make autoconf2.13 gcc g++ flex file zlibc zlib1g zlib1g-dev zip libzip-dev unzip bzip2 libbz2-dev nano m4 perl libglib2.0-0 libglib2.0-dev libncurses5 libncurses5-dev libcap-dev xmlto sqlite libpam0g-dev libwrap0 libwrap0-dev libkrb5-dev db5.1-util
+	#xz-utils
+}
+
+debian_EnvInstall()
+{
+	debian_UpdateSource
+	debian_TimeZone
+	debian_PreInstall
+	debian_Upgrade
+
+	apt-get install -y automake libtool libxml2 libxml2-dev tcl tk gettext e2fsprogs cpio expat
+}
+
+command="$1"
+case "$command" in
+	"EnvInstall" | "Upgrade" )
+		[ -z "$MTENV_V" ] && exec mtenv help debian
+		debian_$command
+		;;
+	* )
+		exec mtenv help debian
+		;;
+esac

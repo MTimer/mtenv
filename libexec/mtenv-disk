@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+disk_CheckLock()
+{
+  count=0
+  tmp1=/mtimer/tmp/.tmp1
+  tmp2=/mtimer/tmp/.tmp2
+  >$tmp1
+  >$tmp2
+  fstab_file=/etc/fstab
+
+  #check lock file ,one time only let the script run one time 
+  LOCKfile=/mtimer/tmp/.$(basename $0)
+  if [ -f "$LOCKfile" ]
+  then
+    echo -e "\033[1;40;31mThe script is already exist,please next time to run this script.\033[0m"
+    exit
+  else
+    echo -e "\033[40;32mStep 1.No lock file,begin to create lock file and continue.\033[40;37m"
+    touch $LOCKfile
+  fi
+}
+
+#check disk partition
+disk_CheckPartition()
+{
+  >$LOCKfile
+  device_list=$(fdisk -l|grep "Disk"|grep "/dev"|awk '{print $2}'|awk -F: '{print $1}'|grep "$FDISKNAME")
+  for i in `echo $device_list`
+  do
+    device_count=$(fdisk -l $i|grep "$i"|awk '{print $2}'|awk -F: '{print $1}'|wc -l)
+    echo 
+    if [ $device_count -lt 2 ]
+    then
+      now_mount=$(df -h)
+      if echo $now_mount|grep -w "$i" >/dev/null 2>&1
+      then
+        echo -e "\033[40;32mThe $i disk is mounted.\033[40;37m"
+      else
+        echo $i >>$LOCKfile
+        echo "You have a free disk,Now will fdisk it and mount it."
+      fi
+    fi
+  done
+  disk_list=$(cat $LOCKfile)
+  if [ "X$disk_list" == "X" ]
+  then
+    echo -e "\033[1;40;31mNo free disk need to be fdisk.Exit script.\033[0m"
+    rm -rf $LOCKfile
+    exit 0
+  else
+    echo -e "\033[40;32mThis system have free disk :\033[40;37m"
+    for i in `echo $disk_list`
+    do
+      echo "$i"
+      count=$((count+1))
+    done
+  fi
+}
+
+#fdisk ,formating and create the file system
+disk_Fdisk()
+{
+fdisk -S 56 $1 << EOF
+n
+p
+1
+
+
+wq
+EOF
+
+sleep 5
+mkfs.ext3 ${1}1
+}
+
+#make directory
+disk_MakeDir()
+{
+  echo -e "\033[40;32mStep 4.Begin to make directory\033[40;37m"
+  count=$((count-1))
+  for j in `seq $count`
+  do
+    if [ -d "/mtimer$j" ]
+    then
+      echo -e "\033[1;40;31m/mtimer$j is exists.This script will exit,you must to choose a directory for mount.\033[0m"
+      rm -rf $LOCKfile $tmp2
+      exit
+    else
+      echo "/mtimer$j" >>$tmp1
+      mkdir /mtimer$j
+    fi
+  done
+ }
+
+#config /etc/fstab and mount device
+disk_Mount()
+{
+  for i in `echo $disk_list`
+  do
+    echo -e "\033[40;32mStep 3.Begin to fdisk free disk.\033[40;37m"
+    disk_Fdisk $i
+    echo "${i}1" >>$tmp2
+  done
+  disk_MakeDir
+  >$LOCKfile
+  paste $tmp2 $tmp1 >$LOCKfile
+  echo -e "\033[40;32mStep 5.Begin to write configuration to /etc/fstab and mount device.\033[40;37m"
+  while read a b
+  do
+    if grep -v ^# $fstab_file|grep ${a} >/dev/null
+    then
+      sed -i "s=${a}*=#&=" $fstab_file
+    fi
+    echo "${a}             ${b}                 ext3    defaults        0 0" >>$fstab_file
+  done <$LOCKfile
+  mount -a
+}
+
+disk_Dialog()
+{
+  fdisk -l|grep "Disk"|grep "/dev"|awk '{print $2}'|awk -F: '{print $1}'
+  echo -ne "\nEnter your disk name eg. sd [if sda,sdb...] , xv [if xva,xvb] : "
+  read FDISKNAME
+}
+
+#=========start script===========
+disk_Install()
+{
+  [ -z "MTENV_V" ] && disk_Dialog
+  echo -e "\033[40;32mStep 2.Begin to check free disk.\033[40;37m"
+  disk_CheckPartition
+  disk_Mount
+  df -h
+  rm -rf $LOCKfile $tmp1 $tmp2
+}
+
+command="$1"
+case "$command" in
+  "Install" )
+    disk_$command
+    ;;
+  * )
+    exec mtenv help disk
+    ;;
+esac

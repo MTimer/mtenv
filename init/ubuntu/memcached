@@ -1,0 +1,183 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          memcached
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Should-Start:        $local_fs
+# Should-Stop:        $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description:    memcached - Memory caching daemon
+# Description:        memcached - Memory caching daemon
+### END INIT INFO
+
+# Written by Mtimer http://www.mtimer.cn
+#
+# description: Distributed memory caching daemon
+#
+# processname: memcached
+# config: /etc/memcached/memcached_xxxxx.conf
+
+#PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+
+# Source function library.  
+. /lib/lsb/init-functions
+
+# Check that networking is up.
+#. /etc/sysconfig/network
+
+#if [ "$NETWORKING" = "no" ]
+#then
+#    exit 0
+#fi
+
+FILES=(/etc/memcached/memcached_*);
+# check for alternative config schema
+if [ -r "${FILES[0]}" ]; then
+	CONFIGS=();
+  	for FILE in "${FILES[@]}";
+  	do
+		# remove prefix
+		#echo "${FILE} ==> file"
+		NAME=${FILE#/etc/memcached/};
+		# check optional second param
+		if [ $# -ne 2 ];
+		then
+		  # add to config array
+		  CONFIGS+=($NAME);
+		elif [ "$2" == "$NAME" ];
+		then
+		  # use only one memcached
+		  CONFIGS=($NAME);
+		  break;
+		fi;
+  	done;
+  if [ ${#CONFIGS[@]} == 0 ];
+  then
+    echo "Config not exist for: $2" >&2;
+    exit 1;
+  fi;
+else
+  CONFIGS=(memcached);
+fi;
+ 
+CONFIG_NUM=${#CONFIGS[@]};
+for ((i=0; i < $CONFIG_NUM; i++)); do
+  NAME=${CONFIGS[${i}]};
+  PIDFILE="/etc/memcached/pidfiles/${NAME}.pid";
+  #echo "LOOP \"$CONFIG_NUM\""
+  #echo "config ==> ${NAME}"
+  #echo "$PIDFILE ==> PID"
+ 
+##
+ 
+RETVAL=0
+#prog="memcached"
+prog="${NAME}"
+source "/etc/memcached/${NAME}"
+desc="Distributed memory caching"
+
+wait_for_pid () {
+	try=0
+
+	while test $try -lt 35 ; do
+
+		case "$1" in
+			'created')
+			if [ -f "$2" ] ; then
+				try=''
+				break
+			fi
+			;;
+
+			'removed')
+			if [ ! -f "$2" ] ; then
+				try=''
+				break
+			fi
+			;;
+		esac
+
+		try=`expr $try + 1`
+		sleep 1
+
+	done
+
+}
+
+start() {
+
+	if [ -d "/etc/memcached/pidfiles" ];then
+		rm -Rf /etc/memcached/pidfiles
+	fi
+	mkdir -p /etc/memcached/pidfiles
+	chmod 755 /etc/memcached/pidfiles
+	chown nobody:nobody /etc/memcached/pidfiles
+
+	echo -n $"Starting $desc (${NAME}): "
+	mkdir -p /var/run/memcached
+	start_daemon /usr/local/bin/memcached -P $PIDFILE -d -p $PORT -u $USER -c $MAXCONN -m $CACHESIZE $OPTIONS
+	#echo " $prog -d -p $PORT -U $PORT -u $USER -c $MAXCONN -m $CACHESIZE $OPTIONS"
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
+	wait_for_pid created $PIDFILE
+	sleep 2
+	memcached_pid=`cat $PIDFILE`
+	echo -17 > /proc/$memcached_pid/oom_adj
+	return $RETVAL
+}
+ 
+stop() {
+	echo -n $"Shutting down $desc ($prog): "
+	echo "$PIDFILE"
+	killproc -p $PIDFILE memcached 
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
+	return $RETVAL
+}
+ 
+restart() {
+	stop
+	start
+}
+ 
+reload() {
+	echo -n $"Reloading $desc ($prog): "
+	killproc $prog -HUP
+	RETVAL=$?
+	echo
+	return $RETVAL
+}
+ 
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart)
+	restart
+	;;
+  condrestart)
+	[ -e /var/lock/subsys/$prog ] && restart
+	RETVAL=$?
+	;;
+  reload)
+	reload
+	;;
+  status)
+	statusproc /usr/local/bin/memcached
+	RETVAL=$?
+	;;
+   *)
+	echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+	RETVAL=1
+esac
+ 
+##$RETVAL
+ 
+done;
