@@ -118,11 +118,11 @@ It works on Linux.
 
 via `curl`
 
-    bash <(curl -sSL git.io/bg6S6w)
+    bash <(curl -sSL git.io/WTRR5Q)
 
 via `wget`
 
-    bash <(wget --no-check-certificate -qO- git.io/bg6S6w)
+    bash <(wget --no-check-certificate -qO- git.io/WTRR5Q)
 
 
 ### The manual way
