@@ -1,7 +1,5 @@
 # Simple Lnmpa Server Management: mtenv
 
-[![Build Status](https://travis-ci.org/MTimer/mtenv.png)](https://travis-ci.org/MTimer/mtenv)
-
 mtenv lets you easily switch between multiple versions of softwares [Linux + Nginx + MySQL/MariaDB + PHP + Apache]. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
 tools that do one thing well.
