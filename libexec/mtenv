@@ -224,7 +224,7 @@ PackageUpdate()
 DownloadPackage()
 {
 	if [ ! -s "${MTENV_V}.tgz" ]; then
-		if ! wget -c --tries=3 http://test.com/lnmpa/${MTENV_V}.tgz >/dev/null 2>&1; then
+		if ! wget -c --tries=3 http://mtimercms.oss.aliyuncs.com/LNMPA-shell/${MTENV_V}.tgz >/dev/null 2>&1; then
 			echo "[Error] Download Failed : ${MTENV_V}.tgz ,Please try again later."
 			exit 1
 		fi
