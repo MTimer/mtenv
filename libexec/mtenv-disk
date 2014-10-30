@@ -3,29 +3,34 @@
 set -e
 [ -n "$MTENV_DEBUG" ] && set -x
 
-disk_CheckLock()
-{
-  count=0
-  tmp1=/mtimer/tmp/.tmp1
-  tmp2=/mtimer/tmp/.tmp2
-  >$tmp1
-  >$tmp2
-  fstab_file=/etc/fstab
+count=0
+tmp1=/mtimer/tmp/.tmp1
+tmp2=/mtimer/tmp/.tmp2
+>$tmp1
+>$tmp2
+fstab_file=/etc/fstab
 
-  #check lock file ,one time only let the script run one time 
-  LOCKfile=/mtimer/tmp/.$(basename $0)
-  if [ -f "$LOCKfile" ]
-  then
-    echo -e "\033[1;40;31mThe script is already exist,please next time to run this script.\033[0m"
-    exit
-  else
-    echo -e "\033[40;32mStep 1.No lock file,begin to create lock file and continue.\033[40;37m"
-    touch $LOCKfile
-  fi
-}
+#check lock file ,one time only let the script run one time 
+LOCKfile=/mtimer/tmp/.$(basename $0)
+if [ -f "$LOCKfile" ]
+then
+  echo -e "\033[1;40;31mThe script is already exist,please next time to run this script.\033[0m"
+  exit
+else
+  echo -e "\033[40;32mStep 1.No lock file,begin to create lock file and continue.\033[40;37m"
+  touch $LOCKfile
+fi
+
+#check user
+if [ $(id -u) != "0" ]
+then
+  echo -e "\033[1;40;31mError: You must be root to run this script, please use root to install this script.\033[0m"
+  rm -rf $LOCKfile
+  exit 1
+fi
 
 #check disk partition
-disk_CheckPartition()
+check_disk()
 {
   >$LOCKfile
   device_list=$(fdisk -l|grep "Disk"|grep "/dev"|awk '{print $2}'|awk -F: '{print $1}'|grep "$FDISKNAME")
@@ -62,7 +67,7 @@ disk_CheckPartition()
 }
 
 #fdisk ,formating and create the file system
-disk_Fdisk()
+fdisk_fun()
 {
 fdisk -S 56 $1 << EOF
 n
@@ -78,7 +83,7 @@ mkfs.ext3 ${1}1
 }
 
 #make directory
-disk_MakeDir()
+make_dir()
 {
   echo -e "\033[40;32mStep 4.Begin to make directory\033[40;37m"
   count=$((count-1))
@@ -97,15 +102,15 @@ disk_MakeDir()
  }
 
 #config /etc/fstab and mount device
-disk_Mount()
+main()
 {
   for i in `echo $disk_list`
   do
     echo -e "\033[40;32mStep 3.Begin to fdisk free disk.\033[40;37m"
-    disk_Fdisk $i
+    fdisk_fun $i
     echo "${i}1" >>$tmp2
   done
-  disk_MakeDir
+  make_dir
   >$LOCKfile
   paste $tmp2 $tmp1 >$LOCKfile
   echo -e "\033[40;32mStep 5.Begin to write configuration to /etc/fstab and mount device.\033[40;37m"
@@ -120,30 +125,9 @@ disk_Mount()
   mount -a
 }
 
-disk_Dialog()
-{
-  fdisk -l|grep "Disk"|grep "/dev"|awk '{print $2}'|awk -F: '{print $1}'
-  echo -ne "\nEnter your disk name eg. sd [if sda,sdb...] , xv [if xva,xvb] : "
-  read FDISKNAME
-}
-
 #=========start script===========
-disk_Install()
-{
-  [ -z "MTENV_V" ] && disk_Dialog
-  echo -e "\033[40;32mStep 2.Begin to check free disk.\033[40;37m"
-  disk_CheckPartition
-  disk_Mount
-  df -h
-  rm -rf $LOCKfile $tmp1 $tmp2
-}
-
-command="$1"
-case "$command" in
-  "Install" )
-    disk_$command
-    ;;
-  * )
-    exec mtenv help disk
-    ;;
-esac
+echo -e "\033[40;32mStep 2.Begin to check free disk.\033[40;37m"
+check_disk
+main
+df -h
+rm -rf $LOCKfile $tmp1 $tmp2
