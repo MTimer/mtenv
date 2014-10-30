@@ -675,14 +675,14 @@ CleanInstall()
 
 	step="$(mtenv set_ulimit install --nolog)"
 
+	# 安装目录
+	step="$(mtenv dir install --nolog)"
+	echo -e "\nDirs created. Please be patient."
 	if [ "$AUTOFDISK" = "1" ] && [ "$FDISKNAME" != "" ]; then
 		# 挂载空白硬盘
 		step=$(mtenv disk install)
 		echo -e "\nauto fdisk done."
 	fi
-	# 安装目录
-	step="$(mtenv dir install --nolog)"
-	echo -e "\nDirs created. Please be patient."
 	# 安装环境
 	progress 2 58 &
 	export PROGRESS_ENV=$!
