@@ -119,6 +119,7 @@ httpd_ModFastcgiInstall()
 			sed -i "s@^#LoadModule cache_module.*@LoadModule cache_module modules/mod_cache.so@" /mtimer/server/httpd/conf/httpd.conf
 			sed -i "s@^#LoadModule ssl_module.*@LoadModule ssl_module modules//mod_ssl.so@" /mtimer/server/httpd/conf/httpd.conf
 		fi
+		sed -i "s@^#LoadModule slotmem_shm_module.*@LoadModule slotmem_shm_module modules/mod_slotmem_shm.so@" /mtimer/server/httpd/conf/httpd.conf
 		sed -i "s@^#LoadModule rewrite_module.*@LoadModule rewrite_module modules/mod_rewrite.so@" /mtimer/server/httpd/conf/httpd.conf
 	else 
 		if [ "$PHPTODO" = "3" ]; then
@@ -126,8 +127,8 @@ httpd_ModFastcgiInstall()
 		else
 			sed -i "s@^LoadModule rewrite_module.*@LoadModule rewrite_module modules/mod_rewrite.so\nLoadModule fastcgi_module modules/mod_fastcgi.so@" /mtimer/server/httpd/conf/httpd.conf
 		fi
-		sed -i "s@^#ServerName .*@ServerName example.com:80@" /mtimer/server/httpd/conf/httpd.conf
 	fi
+	sed -i "s@^#ServerName .*@ServerName example.com:80@" /mtimer/server/httpd/conf/httpd.conf
 	make
 	make install
 
