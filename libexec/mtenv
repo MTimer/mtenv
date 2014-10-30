@@ -443,7 +443,7 @@ RootChoose()
 	echo -ne "\n1. Please enter your license key:     "
 	while read MTEnvLicense; do
 		case "$MTEnvLicense" in
-			"" ) echo -ne "\nEmpty?\nPlease enter the license key: " ;
+			"" ) echo -ne "\nEmpty?\nPlease enter the license key: " ;;
 			* ) break ;;
 		esac
 	done
