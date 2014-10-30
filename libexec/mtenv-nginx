@@ -22,7 +22,8 @@ nginx_Config()
 	cp -f ${MCONF_PATH}/nginx/vhosts/example.com.conf /mtimer/server/nginx/conf/vhosts/
 	cp -f ${MCONF_PATH}/nginx/vhosts/soft.example.com.conf /mtimer/server/nginx/conf/vhosts/
 	cp -f ${MCONF_PATH}/nginx/vhosts/${MSQLTYPE}.conf /mtimer/server/nginx/conf/vhosts/
-	cp -f ${MCONF_PATH}/nginx/vhosts/dle.conf /mtimer/server/nginx/conf/vhosts/
+	cp -f ${MCONF_PATH}/nginx/vhosts/dle.example.com.conf /mtimer/server/nginx/conf/vhosts/
+	cp -f ${MCONF_PATH}/nginx/vhosts/wordpress.example.com.conf /mtimer/server/nginx/conf/vhosts/
 	sed -i "s#www/dle#www/${dle_dir}#g" /mtimer/server/nginx/conf/vhosts/dle.example.com.conf
 	sed -i "s#www/wordpress#www/${wp_dir}#g" /mtimer/server/nginx/conf/vhosts/wordpress.example.com.conf
 
