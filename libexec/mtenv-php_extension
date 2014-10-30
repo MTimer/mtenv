@@ -74,6 +74,9 @@ php_extension_ZendGuardLoaderInstall()
 		5)
 			ExtensionDay=20121212
 			;;
+		6)
+			ExtensionDay=20131226
+			;;
 	esac
 
 	# ZendGuardLoader
