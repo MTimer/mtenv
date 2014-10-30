@@ -328,6 +328,30 @@ env_GitInstall()
 	fi
 }
 
+env_GeoipInstall()
+{
+	Downloadfile lib-web/geoip/GeoIP.tar.gz GeoIP-1.4.8
+	./configure
+	make
+	make install
+}
+
+env_Geoip2Install()
+{
+	mkdir -p /usr/local/share/GeoIP
+	Downloadfile lib-web/geoip/GeoLite2-City.mmdb.zip ./
+	Downloadfile lib-web/geoip/GeoLite2-Country.mmdb.zip ./
+	mv -f GeoLite2-City.mmdb /usr/local/share/GeoIP/
+	mv -f GeoLite2-Country.mmdb /usr/local/share/GeoIP/
+	git clone --recursive https://github.com/maxmind/libmaxminddb
+	cd libmaxminddb
+	./bootstrap
+	./configure
+	make check
+	make install
+	ldconfig
+}
+
 env_NodeInstall()
 {
 	Downloadfile lib-web/node/${node_dir}.tar.gz
@@ -477,6 +501,8 @@ env_Install()
 	env_PythonInstall
 	env_AsciidocInstall
 	env_GitInstall
+	env_GeoipInstall
+	env_Geoip2Install
 
 	#if [ "$MTEnvLicense" = "yes" ] ; then
 	#	env_NodeInstall
