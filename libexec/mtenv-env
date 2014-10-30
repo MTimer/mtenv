@@ -331,6 +331,7 @@ env_GitInstall()
 env_GeoipInstall()
 {
 	Downloadfile lib-web/geoip/GeoIP.tar.gz GeoIP-1.4.8
+	libtoolize -f
 	./configure
 	make
 	make install
