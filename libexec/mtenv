@@ -561,7 +561,7 @@ RootChoose()
 	export mysql_version
 	export mariadb_version
 	export apache_version
-	export nginx_version
+	export nginx_version=${M_NGINX}
 
 	export apache_dir=httpd-${apache_version}
 	export nginx_dir=nginx-${nginx_version}
