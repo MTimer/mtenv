@@ -9,25 +9,52 @@ mysql_PackageInstall()
 
 	case "$SQLTODO" in
 		1) # MYSQL 5.1.X && MariaDB 5.3.X
-			./configure \
-			--prefix=/mtimer/server/${SQLTYPE} \
-			--localstatedir=/mtimer/server/${SQLTYPE}/data \
-			--with-unix-socket-path=/mtimer/tmp/mysql.sock \
-			--with-ssl=/usr/local/ssl \
-			--sysconfdir=/etc \
-			--with-mysqld-user=mysql \
-			--with-charset=utf8 \
-			--with-collation=utf8_general_ci \
-			--with-extra-charsets=all \
-			--enable-thread-safe-client \
-			--with-big-tables \
-			--with-embedded-server \
-			--enable-local-infile \
-			--enable-assembler \
-			--with-plugins=innobase,partition \
-			--with-mysqld-ldflags=-all-static \
-			--with-client-ldflags=-all-static \
-			--without-debug
+			if [ "$SQLTYPE" = "mysql" ]; then
+				local INNO="innobase,innodb_plugin"
+			else
+				local INNO="innodb_plugin"
+			fi
+			local FNO_OUTPUT="$(man gcc|grep 'fno-exceptions' || true)"
+			if [ -n "$FNO_OUTPUT" ]; then
+				CPOPTION=CFLAGS="-O3" CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti" \
+				./configure \
+				--prefix=/mtimer/server/${SQLTYPE} \
+				--localstatedir=/mtimer/server/${SQLTYPE}/data \
+				--with-unix-socket-path=/mtimer/tmp/mysql.sock \
+				--with-ssl=/usr/local/ssl \
+				--sysconfdir=/etc \
+				--with-mysqld-user=mysql \
+				--with-charset=utf8 \
+				--with-collation=utf8_general_ci \
+				--with-extra-charsets=all \
+				--enable-thread-safe-client \
+				--with-big-tables \
+				--with-embedded-server \
+				--enable-local-infile \
+				--enable-assembler \
+				--with-plugins=partition,${INNO} \
+				--without-debug
+			else
+				./configure \
+				--prefix=/mtimer/server/${SQLTYPE} \
+				--localstatedir=/mtimer/server/${SQLTYPE}/data \
+				--with-unix-socket-path=/mtimer/tmp/mysql.sock \
+				--with-ssl=/usr/local/ssl \
+				--sysconfdir=/etc \
+				--with-mysqld-user=mysql \
+				--with-charset=utf8 \
+				--with-collation=utf8_general_ci \
+				--with-extra-charsets=all \
+				--enable-thread-safe-client \
+				--with-big-tables \
+				--with-embedded-server \
+				--enable-local-infile \
+				--enable-assembler \
+				--with-plugins=partition,${INNO} \
+				--without-debug
+			fi
+			#--with-mysqld-ldflags=-all-static \
+			#--with-client-ldflags=-all-static \
 			# --with-plugins=max-no-ndb
 			;;
 		2|3|5|6) # MYSQL 5.5.X, 5.6.X && MariaDB 5.5.X, 10.0.X
