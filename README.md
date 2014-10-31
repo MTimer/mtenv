@@ -25,7 +25,7 @@ This project was inspired by [rbenv](https://github.com/sstephenson/rbenv) and
 ### In contrast with other lnmpa script, mtenv _does not..._
 
 * **Depend on source packages.** mtenv was made from pure shell scripts and compiles softwares.
-    There is no bootstrap problem of LNMPA.
+    There is no bootstrap problem of MTEnv.
 * **Need to be loaded into your shell.** Instead, mtenv's shim
     approach works by adding a directory to your `$PATH`.
 * **Deny evolution.** Compiling makes mtenv easy to be modified to suit your needs.
@@ -58,7 +58,7 @@ This project was inspired by [rbenv](https://github.com/sstephenson/rbenv) and
 
 At a high level, mtenv intercepts LNMPA commands using shim
 executables injected into your `PATH`, and passes your commands along
-to the LNMPA installation.
+to the MTEnv installation.
 
 
 ### Understanding PATH
@@ -148,8 +148,8 @@ easy to fork and contribute any changes back upstream.
 
         $ exec $SHELL
 
-5. **Install LNMPA included packages.**
-   For example, to install LNMPA 2.7.6, download and unpack the source, then run:
+5. **Install MTEnv included packages.**
+   For example, to install MTEnv, download and unpack the source, then run:
 
         $ mtenv install
 
