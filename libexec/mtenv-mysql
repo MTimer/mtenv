@@ -62,7 +62,7 @@ mysql_PackageInstall()
 			-DCMAKE_INSTALL_PREFIX=/mtimer/server/${SQLTYPE} \
 			-DMYSQL_DATADIR=/mtimer/server/${SQLTYPE}/data \
 			-DMYSQL_UNIX_ADDR=/mtimer/tmp/mysql.sock \
-			-DWITH_SSL=/usr/local/ssl \
+			-DWITH_SSL=system \
 			-DSYSCONFDIR=/etc \
 			-DWITH_EMBEDDED_SERVER=1 \
 			-DCMAKE_BUILD_TYPE=Release \
