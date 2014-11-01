@@ -371,6 +371,24 @@ ExecCommand()
 		read -p "Remove all files in dir /mtimer ? [y/n]     " removeall
 		Uninstall
 		;;
+	"-p" | "--pause" )
+		# pause before $2 command
+		case "$2" in
+			"" )
+				echo "Missing command.Exit."
+				exit 1
+				;;
+			* )
+				export PAUSE_COMMAND=$2
+				if [ "$INSTALLONCE" != "1" ]; then
+					export INSTALLONCE=1
+					MakeSwap
+					exec mtenv 2>&1|tee $MLOGS_PATH/install_${a}.log
+					exit 0
+				fi
+				;;
+		esac
+		;;
 	"" | "install" )
 		if [ "$INSTALLONCE" != "1" ]; then
 			export INSTALLONCE=1
@@ -392,6 +410,12 @@ ExecCommand()
 			"set_sysctl" | "set_ulimit" )
 				;;
 			* )
+				if [ "$PAUSE_COMMAND" = "$command" ]; then
+					echo "Done. Paused before executing command $command"
+					killprogress
+					exit 1
+				fi
+
 				if [ -e $HOME/.mtenv/conf/config ]; then
 					. $HOME/.mtenv/conf/config
 				else
@@ -666,6 +690,16 @@ progress()
 	done
 }
 
+killprogress()
+{
+	# Kill progress
+	kill $PROGRESS_ENV >/dev/null 2>&1 || true
+	kill $PROGRESS_MYSQL >/dev/null 2>&1 || true
+	kill $PROGRESS_WEBSERVER >/dev/null 2>&1 || true
+	kill $PROGRESS_PHP >/dev/null 2>&1 || true
+	kill $PROGRESS_SOFT >/dev/null 2>&1 || true
+}
+
 CleanInstall()
 {
 	local c=$(date +%Y%m%d-%H:%M:%S)
@@ -864,12 +898,7 @@ FinishInstall()
 	#	fi
 	#fi
 
-	# Kill progress
-	kill $PROGRESS_ENV >/dev/null 2>&1 || true
-	kill $PROGRESS_MYSQL >/dev/null 2>&1 || true
-	kill $PROGRESS_WEBSERVER >/dev/null 2>&1 || true
-	kill $PROGRESS_PHP >/dev/null 2>&1 || true
-	kill $PROGRESS_SOFT >/dev/null 2>&1 || true
+	killprogress
 }
 
 Uninstall()
