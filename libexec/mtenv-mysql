@@ -59,6 +59,8 @@ mysql_PackageInstall()
 			;;
 		2|3|5|6) # MYSQL 5.5.X, 5.6.X && MariaDB 5.5.X, 10.0.X
 			cmake . \
+			-DCMAKE_INCLUDE_PATH=/usr/local/ssl/include \
+			-DCMAKE_LIBRARY_PATH=/usr/local/ssl/lib \
 			-DCMAKE_INSTALL_PREFIX=/mtimer/server/${SQLTYPE} \
 			-DMYSQL_DATADIR=/mtimer/server/${SQLTYPE}/data \
 			-DMYSQL_UNIX_ADDR=/mtimer/tmp/mysql.sock \
