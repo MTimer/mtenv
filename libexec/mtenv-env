@@ -257,6 +257,7 @@ env_FreetypeInstall()
 	./configure --prefix=/usr/local/${freetype_dir}
 	make
 	make install
+	ln -vs /usr/local/${freetype_dir}/include/freetype2/ /usr/local/${freetype_dir}/include/freetype2/freetype
 }
 
 env_LibeventInstall()
