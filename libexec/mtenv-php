@@ -149,6 +149,7 @@ php_PackageInstall()
 
 	make #ZEND_EXTRA_LIBS='-liconv'
 	make install
+	export ISMODPHP
 }
 
 php_Config()

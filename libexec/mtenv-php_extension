@@ -141,7 +141,7 @@ php_extension_Install()
 	#	php_extension_PhpredisInstall
 	#fi
 
-	service php-fpm restart
+	service php-fpm restart || true
 }
 
 command="$1"
