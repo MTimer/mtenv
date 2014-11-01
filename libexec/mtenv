@@ -195,11 +195,7 @@ ExportPath()
 	export MPACKAGES_PATH="$MTENV_PATH/packages"
 	export MUNPACKED_PATH="$MPACKAGES_PATH/unpacked"
 
-	mtenv_path="$(command -v mtenv---version || true)"
-	if [ -z "$mtenv_path" ]; then
-		export ADDMTENVPATH=1
-		export PATH="${MLIBEXEC_PATH}:${PATH}"
-	fi
+	export PATH=${MLIBEXEC_PATH}:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:~/bin
 }
 
 PackageReady()
@@ -240,6 +236,11 @@ DownloadPackage()
 
 	cd ${MLIBEXEC_PATH}
 	chmod +x ./*
+
+	mtenv_exist="$(command -v mtenv---version || true)"
+	if [ -z "$mtenv_exist" ]; then
+		ln -vs ${MLIBEXEC_PATH}/mtenv /usr/sbin/mtenv
+	fi
 }
 
 # Functions needs to be exported.
@@ -887,16 +888,6 @@ FinishInstall()
 	/etc/init.d/iptables save >/dev/null 2>&1 || true
 
 	ln -s ${MLIBEXEC_PATH}/mtenv /usr/bin/mtenv
-
-	#if [ "$ADDMTENVPATH" = "1" ]; then
-	#	if [ -f ~/.zshrc ] || [ -h ~/.zshrc ]; then
-	#	  echo "export PATH=~/.mtenv/libexec:$PATH" >> ~/.zshrc
-	#	fi
-
-	#	if [ -f ~/.bashrc ] || [ -h ~/.bashrc ]; then
-	#	  echo "export PATH=~/.mtenv/libexec:$PATH" >> ~/.bashrc
-	#	fi
-	#fi
 
 	killprogress
 }

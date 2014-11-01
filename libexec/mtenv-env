@@ -6,13 +6,6 @@ set -e
 env_Verify()
 {
 	[ -z "$MTENV_V" ] && exec mtenv help env
-	env_PathFix
-	env_Ldconfig
-}
-
-env_PathFix()
-{
-	export PATH=${MLIBEXEC_PATH}:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:~/bin
 }
 
 env_Ldconfig()
@@ -533,6 +526,7 @@ env_Install()
 command="$1"
 subcommand="$2"
 env_Verify
+env_Ldconfig
 if [ "$subcommand" = "--debug" ] || [ "$subcommand" = "--dev" ]; then
 	env_$command
 else
