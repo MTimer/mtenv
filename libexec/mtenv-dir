@@ -80,7 +80,7 @@ dir_Install()
 command="$1"
 case "$command" in
 	"Install" )
-		[ -z "$MTENV_V" ] && exec mtenv help dir
+		[ -z "$MTENV_V" ] || exec mtenv help dir
 		dir_$command
 		;;
 	* )

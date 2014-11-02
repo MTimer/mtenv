@@ -177,9 +177,7 @@ ubuntu_PreInstall()
 	vi_path=$(command -v vi)
 	mv -f ${vi_path} ${vi_path}-old
 	vim_path="$(command -v vim || true)"
-	if [ -z "$vim_path" ]; then
-		apt-get install -y vim
-	fi
+	[ -z "$vim_path" ] || apt-get install -y vim
 	ln -vs $(command -v vim) ${vi_path}
 	if [ -s /etc/selinux/config ]; then
 		sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
@@ -206,7 +204,7 @@ ubuntu_EnvInstall()
 command="$1"
 case "$command" in
 	"EnvInstall" | "Upgrade" )
-		[ -z "$MTENV_V" ] && exec mtenv help ubuntu
+		[ -z "$MTENV_V" ] || exec mtenv help ubuntu
 		ubuntu_$command
 		;;
 	* )
