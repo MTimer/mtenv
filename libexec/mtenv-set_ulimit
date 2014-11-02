@@ -5,7 +5,6 @@ set -e
 
 set_ulimit_Install()
 {
-	[ -z "MTENV_V" ] || [ -e /etc/security/limits.conf.old ] && echo -e "Done\a\n" && exit 1
 	cp -f /etc/security/limits.conf /etc/security/limits.conf.old
 	cat >> /etc/security/limits.conf <<-EOF
 	* soft nproc 65535
@@ -23,7 +22,7 @@ set_ulimit_Uninstall()
 command="$1"
 case "$command" in
 	"Install" | "Uninstall" )
-		[ -z "$MTENV_V" ] || exec mtenv help set_ulimit
+		[ -n "$MTENV_V" ] || exec mtenv help set_ulimit
 		set_ulimit_$command
 		;;
 	* )

@@ -5,7 +5,7 @@ set -e
 
 env_Verify()
 {
-	[ -z "$MTENV_V" ] || exec mtenv help env
+	[ -n "$MTENV_V" ] || exec mtenv help env
 }
 
 env_Ldconfig()

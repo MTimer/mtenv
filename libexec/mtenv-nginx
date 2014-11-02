@@ -47,7 +47,7 @@ nginx_Install()
 command="$1"
 case "$command" in
 	"Install" | "Uninstall" | "Upgrade" )
-		[ -z "$MTENV_V" ] || exec mtenv help nginx
+		[ -n "$MTENV_V" ] || exec mtenv help nginx
 		nginx_$command
 		;;
 	* )

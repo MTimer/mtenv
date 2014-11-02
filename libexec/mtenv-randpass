@@ -81,7 +81,7 @@ randpass_Dynamic()
 command="$1"
 case "$command" in
 	"Static" | "Dynamic" )
-		[ -z "$MTENV_V" ] || exec mtenv help randpass
+		[ -n "$MTENV_V" ] || exec mtenv help randpass
 		randpass_$command
 		;;
 	"" )

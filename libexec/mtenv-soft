@@ -169,7 +169,7 @@ soft_Install()
 command="$1"
 case "$command" in
 	"Install" | "Uninstall" | "Upgrade" )
-		[ -z "$MTENV_V" ] || exec mtenv help soft
+		[ -n "$MTENV_V" ] || exec mtenv help soft
 		soft_$command
 		;;
 	* )

@@ -16,7 +16,7 @@ ftp_Deleteuser()
 command="$1"
 case "$command" in
 	"Adduser" | "Deleteuser" )
-		[ -z "$MTENV_V" ] || exec mtenv help ftp
+		[ -n "$MTENV_V" ] || exec mtenv help ftp
 		ftp_$command
 		;;
 	* )

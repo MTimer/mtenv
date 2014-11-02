@@ -147,7 +147,7 @@ php_extension_Install()
 command="$1"
 case "$command" in
 	"Install" | "Uninstall" | "Upgrade" )
-		[ -z "$MTENV_V" ] || exec mtenv help php_extension
+		[ -n "$MTENV_V" ] || exec mtenv help php_extension
 		php_extension_$command
 		;;
 	* )

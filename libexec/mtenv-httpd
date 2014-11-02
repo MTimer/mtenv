@@ -151,7 +151,7 @@ httpd_Install()
 command="$1"
 case "$command" in
 	"Install" | "Uninstall" | "Upgrade" )
-		[ -z "$MTENV_V" ] || exec mtenv help httpd
+		[ -n "$MTENV_V" ] || exec mtenv help httpd
 		httpd_$command
 		;;
 	* )
