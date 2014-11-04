@@ -41,7 +41,7 @@ ddos_BfdInstall()
 
 ddos_DeflateInstall()
 {
-	mkdir /usr/local/ddos
+	mkdir -p /usr/local/ddos/tmp
 	
 	Downloadfile ddos/${deflate_dir}.zip
 	mv * /usr/local/ddos/
