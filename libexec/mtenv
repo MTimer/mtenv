@@ -113,6 +113,9 @@ export phpmyadmin_dir=phpMyAdmin-4.2.8-all-languages
 export wp_version=4.0 # Wordpress
 export dle_version=10-2-en # DatalifeEngine
 export vsftpd_dir=vsftpd-3.0.2
+export apf_dir=apf-9.7-2
+export bfd_dir=bfd-1.5-2
+export deflate_dir=deflate-0.6
 
 RootMust()
 {
