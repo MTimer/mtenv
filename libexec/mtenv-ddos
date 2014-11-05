@@ -8,7 +8,7 @@ ddos_ApfInstall()
 	Downloadfile ddos/${apf_dir}.tar.gz
 	./install.sh
 	cp -f ${MCONF_PATH}/ddos/apf/conf.apf /etc/apf/conf.apf
-	/usr/local/sbin/apf -s
+	/usr/local/sbin/apf -s > /dev/null 2>&1
 }
 
 ddos_BfdInstall()
@@ -27,7 +27,7 @@ ddos_BfdInstall()
 					export ALERTEMAIL
 					case "$ALERTEMAIL" in
 						"" ) echo -ne "\nIncorrect value option!\nPlease enter the correct value: " ;;
-						* ) sed -i 's/^EMAIL_ADDRESS="root"/EMAIL_ADDRESS="$ALERTEMAIL"/' /usr/local/bfd/conf.bfd; break ;;
+						* ) sed -i "s/^EMAIL_ADDRESS=\"root\"/EMAIL_ADDRESS=\"$ALERTEMAIL\"/" /usr/local/bfd/conf.bfd; break ;;
 					esac
 				done
 				break ;;
@@ -36,7 +36,8 @@ ddos_BfdInstall()
 		esac
 	done
 
-	/usr/local/sbin/bfd -s
+	/usr/local/sbin/bfd -s > /dev/null 2>&1
+	echo -e '\nBFD installed.'
 }
 
 ddos_DeflateInstall()
@@ -45,42 +46,35 @@ ddos_DeflateInstall()
 	
 	Downloadfile ddos/${deflate_dir}.zip
 	mv * /usr/local/ddos/
-
+	chmod +x /usr/local/ddos/ddos.sh
 	cp -s /usr/local/ddos/ddos.sh /usr/local/sbin/ddos
 
-	echo; echo -n 'Creating cron to run script every minute.....(Default setting)'
+	echo -e '\nCreating cron to run script every minute.....(Default setting)'
 	/usr/local/ddos/ddos.sh --cron > /dev/null 2>&1
 
-	echo; echo 'Installation has completed.'
+	echo -e '\nDDos deflate installed.'
 	echo 'Config file is at /usr/local/ddos/ddos.conf'
-	echo 'Please send in your comments and/or suggestions to zaf@vsnl.com'
 	echo
 	#cat /usr/local/ddos/LICENSE | less
 
-	sed -i 's/^EMAIL_TO="root"/EMAIL_TO="$ALERTEMAIL"/' /usr/local/ddos/ddos.conf
+	sed -i "s/^EMAIL_TO=\"root\"/EMAIL_TO=\"$ALERTEMAIL\"/" /usr/local/ddos/ddos.conf
 	/usr/local/sbin/ddos -c
 }
 
 ddos_DeflateUninstall()
 {
-	echo; echo "Uninstalling DOS-Deflate"
-	echo; echo; echo -n "Deleting script files....."
+	echo -e "\nUninstalling DOS-Deflate if it exists"
 	if [ -e '/usr/local/sbin/ddos' ]; then
 		rm -f /usr/local/sbin/ddos
-		echo -n ".."
 	fi
 	if [ -d '/usr/local/ddos' ]; then
 		rm -rf /usr/local/ddos
-		echo -n ".."
 	fi
-	echo "done"
-	echo; echo -n "Deleting cron job....."
+	echo -e "\nDeleting cron job if it exists"
 	if [ -e '/etc/cron.d/ddos.cron' ]; then
 		rm -f /etc/cron.d/ddos.cron
-		echo -n ".."
 	fi
-	echo "done"
-	echo; echo "Uninstall Complete"; echo
+	echo
 }
 
 ddos_Install()
