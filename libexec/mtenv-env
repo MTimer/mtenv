@@ -32,7 +32,7 @@ env_Ldconfig()
 env_AutoconfInstall()
 {
 	Downloadfile lib-web/autoconf/${autoconf_dir}.tar.gz
-	./configure --prefix=/usr/local/${autoconf_dir}
+	./configure #--prefix=/usr/local/${autoconf_dir}
 	make
 	make install
 }
@@ -471,6 +471,38 @@ env_SqlfixInstall()
 	cd ${MEXTRA_PATH}
 	gcc -o lemon lemon.c
 	mv lemon /usr/local/bin/
+}
+
+env_DoxygenInstall()
+{
+	#缺失dot,需安装Graphviz
+	Downloadfile lib-web/doxygen/${doxygen_dir}.src.tar.gz
+	./configure --prefix /usr --docdir /usr/share/doc/${doxygen_dir}
+	make
+	make MAN1DIR=share/man/man1 install
+	# you must have Python, TeX Live (for HTML docs) and Ghostscript (for PDF docs) installed
+	#make install_docs
+}
+
+env_PoptInstall()
+{
+	Downloadfile lib-web/popt/${popt_dir}.tar.gz
+	./configure --prefix=/usr --disable-static
+	make
+	#doxygen
+	make install
+	#install -v -m755 -d /usr/share/doc/${popt_dir}
+	#install -v -m644 doxygen/html/* /usr/share/doc/${popt_dir}
+}
+
+env_LogrotateInstall()
+{
+	#对autoconf等版本要求太高
+	Downloadfile lib-web/logrotate/${logrotate_dir}.tar.gz
+	./autogen.sh
+	./configure --prefix=/usr
+	make
+	make install
 }
 
 env_Install()
