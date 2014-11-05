@@ -238,7 +238,7 @@ DownloadPackage()
 	mkdir packages/unpacked
 
 	cd ${MLIBEXEC_PATH}
-	chmod +x ./*
+	chmod 755 ./*
 
 	ln -vsf ${MLIBEXEC_PATH}/mtenv /usr/sbin/mtenv
 }
