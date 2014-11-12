@@ -33,7 +33,6 @@
 #┐	全部程序安装在目录
 #│	/mtimer/		—— 		重要服务存放位置
 #│		log/		—— 		存放各种日志
-#│		git/		—— 		可选
 #│		server/		—— 		各种服务程序
 #│		www/		—— 		网站目录，子网站存放在每个子目录
 #│		tmp/		—— 		存放pidfile,socket,lock等
@@ -49,6 +48,11 @@ set -e
 [ -n "$MTENV_DEBUG" ] && set -x
 
 export MTENV_V="mtenv-20141028"
+
+CN_1="http://mtimercms.u.qiniudn.com/"
+CN_2="http://mtimercms.oss.aliyuncs.com/"
+US_1="http://mtimercms.u.qiniudn.com/"
+US_2="http://mtimercms.oss.aliyuncs.com/"
 
 MCONF="conf"
 MCRON="cron"
@@ -198,7 +202,7 @@ ExportPath()
 	export MPACKAGES_PATH="$MTENV_PATH/packages"
 	export MUNPACKED_PATH="$MPACKAGES_PATH/unpacked"
 
-	export PATH=${MLIBEXEC_PATH}:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:~/bin
+	export PATH=${MLIBEXEC_PATH}:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:~/bin:/mtimer/server/git/bin
 }
 
 PackageReady()
@@ -247,11 +251,11 @@ DownloadPackage()
 Downloadfile()
 {
 	if [ "$WHERE" = "china" ]; then
-		local site1="http://mtimercms.u.qiniudn.com/"
-		local site2="http://mtimercms.oss.aliyuncs.com/"
+		local site1=${CN_1}
+		local site2=${CN_2}
 	else
-		local site1="http://mtimercms.u.qiniudn.com/"
-		local site2="http://mtimercms.oss.aliyuncs.com/"
+		local site1=${US_1}
+		local site2=${US_2}
 	fi
 	local randstr=$(date +%s)
 	local package="${1##*/}"

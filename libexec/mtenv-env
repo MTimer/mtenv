@@ -314,11 +314,9 @@ env_GitInstall()
 		# 下面是Git之类的，一般用户并不需要，当然使用Nodechat模块的用户必须安装
 		Downloadfile lib-web/git/${git_dir}.tar.gz
 		make configure
-		./configure --prefix=/mtimer/git
+		./configure --prefix=/mtimer/server/git
 		make all #doc
 		make install
-
-		export PATH=$PATH:/mtimer/git/bin
 	fi
 }
 
