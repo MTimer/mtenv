@@ -49,10 +49,10 @@ set -e
 
 export MTENV_V="mtenv-20141028"
 
-CN_1="http://mtimercms.u.qiniudn.com/"
-CN_2="http://mtimercms.oss.aliyuncs.com/"
-US_1="http://mtimercms.u.qiniudn.com/"
-US_2="http://mtimercms.oss.aliyuncs.com/"
+export CN_1="http://mtimercms.u.qiniudn.com/"
+export CN_2="http://mtimercms.oss.aliyuncs.com/"
+export US_1="http://mtimercms.u.qiniudn.com/"
+export US_2="http://mtimercms.oss.aliyuncs.com/"
 
 MCONF="conf"
 MDOCS="docs"
