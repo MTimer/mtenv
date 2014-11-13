@@ -55,7 +55,6 @@ US_1="http://mtimercms.u.qiniudn.com/"
 US_2="http://mtimercms.oss.aliyuncs.com/"
 
 MCONF="conf"
-MCRON="cron"
 MDOCS="docs"
 MEXTRA="extra"
 MINIT="init"
@@ -193,7 +192,6 @@ ExportPath()
 {
 	export MTENV_PATH="$HOME/.mtenv"
 	export MCONF_PATH="$MTENV_PATH/$MCONF"
-	export MCRON_PATH="$MTENV_PATH/$MCRON"
 	export MDOCS_PATH="$MTENV_PATH/$MDOCS"
 	export MEXTRA_PATH="$MTENV_PATH/$MEXTRA"
 	export MINIT_PATH="$MTENV_PATH/$MINIT/$PACKAGE"
@@ -811,14 +809,7 @@ FinishInstall()
 	modprobe ip_tables
 	modprobe iptable_filter
 
-	mkdir /mtimer/server/${WEBTYPE}/crons
-	cp ${MCRON_PATH}/split_${WEBTYPE}_log /mtimer/server/${WEBTYPE}/crons/split_${WEBTYPE}_log
-
-	# 添加 定时任务
-	cat >>/etc/cron.d/${WEBTYPE}<<-EOF
-	SHELL=/bin/bash
-	00 00 * * * /bin/bash /mtimer/server/httpd/crons/split_${WEBTYPE}_log
-	EOF
+	step="$(mtenv logrotate install --nolog)"
 
 	echo '';
 	echo '';

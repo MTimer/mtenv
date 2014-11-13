@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$MTENV_DEBUG" ] && set -x
+
+logrotate_HttpdInstall()
+{
+	cat > /etc/logrotate.d/apache <<-EOF
+	/mtimer/log/httpd/*log {
+	daily
+	rotate 7
+	missingok
+	dateext
+	compress
+	notifempty
+	sharedscripts
+	prerotate
+	pidfile=/mtimer/tmp/httpd.pid
+	add_pid=\`ps aux | grep "httpd" | grep -v "/bin/sh" | grep -v "grep" | head -1 | awk '{print \$2}'\`
+	if [ ! -s \$pidfile ] && [ -n "\$add_pid" ];then
+	    echo "\$add_pid" > \$pidfile
+	fi
+	endscript
+	sharedscripts
+	postrotate
+	[ -s /mtimer/tmp/httpd.pid ] && kill -USR1 \`cat /mtimer/tmp/httpd.pid\`
+	endscript
+	}
+	EOF
+}
+
+logrotate_NginxInstall()
+{
+	cat > /etc/logrotate.d/nginx <<-EOF
+	/mtimer/log/nginx/*log {
+	daily
+	rotate 7
+	missingok
+	dateext
+	compress
+	notifempty
+	sharedscripts
+	prerotate
+	pidfile=/mtimer/tmp/nginx.pid
+	add_pid=\`ps aux | grep nginx | grep master | awk '{print \$2}'\`
+	if [ ! -s \$pidfile ] && [ "\$add_pid" != "" ];then
+	    echo "\$add_pid" > \$pidfile
+	fi
+	endscript
+	sharedscripts
+	postrotate
+	[ -s /mtimer/tmp/nginx.pid ] && kill -USR2 \`cat /mtimer/tmp/nginx.pid\` && kill -QUIT \`cat /mtimer/tmp/nginx.pid.oldbin\`
+	endscript
+	}
+	EOF
+	# or you can kill -HUP \`cat /mtimer/tmp/nginx.pid\` -- reload configuration file
+}
+
+logrotate_PhpInstall()
+{
+	cat > /etc/logrotate.d/php-fpm <<-EOF
+	/mtimer/log/php/*log {
+	daily
+	rotate 7
+	missingok
+	dateext
+	compress
+	notifempty
+	sharedscripts
+	prerotate
+	pidfile=/mtimer/tmp/php-fpm.pid
+	add_pid=\`ps aux | grep php-fpm | grep master | awk '{print \$2}'\`
+	if [ ! -s \$pidfile ] && [ "\$add_pid" != "" ];then
+	    echo "\$add_pid" > \$pidfile
+	fi
+	endscript
+	sharedscripts
+	postrotate
+	[ -s /mtimer/tmp/php-fpm.pid ] && kill -USR2 \`cat /mtimer/tmp/php-fpm.pid\`
+	endscript
+	}
+	EOF
+	# or just kill -USR1 -- reopen log file
+}
+
+logrotate_Install()
+{
+	case "$WEBTYPE" in
+		"httpd" )
+			logrotate_HttpdInstall
+			;;
+		"nginx" )
+			logrotate_NginxInstall
+			;;
+		* )
+			echo -ne "\nWhich webserver do you want to logrotate for ? [a]pache or [n]ginx ? "
+			while read AORN; do
+				case "$AORN" in
+					"a" ) logrotate_HttpdInstall; break ;;
+					"n" ) logrotate_NginxInstall; break ;;
+					*) echo -ne "\nIncorrect value option!\nPlease enter the correct value: " ;;
+				esac
+			done
+			;;
+	esac
+	echo -e "\nDone."
+}
+
+command="$1"
+case "$command" in
+	"Install" | "Uninstall" )
+		[ -n "$MTENV_V" ] || exec mtenv help logrotate
+		logrotate_$command
+		;;
+	* )
+		exec mtenv help logrotate
+		;;
+esac

@@ -95,7 +95,7 @@ centos_Upgrade()
 {
 	cp -f /etc/yum.conf /etc/yum.conf.old
 	sed -i 's/^exclude/#exclude/' /etc/yum.conf
-	yum -y install patch make gcc gcc-c++ flex file zip unzip bzip2 bzip2-devel xz nano m4 perl perl-devel perl-ExtUtils-MakeMaker perl-CPAN kernel-devel glib2 glib2-devel ncurses ncurses-devel libidn libidn-devel libcap libcap-devel xmlto gmp gmp-devel sqlite man tcp_wrappers tcp_wrappers-devel pam pam-devel krb5-devel db4-utils
+	yum -y install patch make gcc gcc-c++ flex file zip unzip bzip2 bzip2-devel xz nano m4 perl perl-devel perl-ExtUtils-MakeMaker perl-CPAN kernel-devel glib2 glib2-devel ncurses ncurses-devel libidn libidn-devel libcap libcap-devel xmlto gmp gmp-devel sqlite man tcp_wrappers tcp_wrappers-devel pam pam-devel krb5-devel db4-utils logrotate
 	mv -f /etc/yum.conf.old /etc/yum.conf
 }
 

@@ -31,7 +31,7 @@ set -e
 
 add_pid=$(ps aux | grep nginx | grep master | awk '{print $2}')
 
-if [ "$add_pid" != "" ];then
+if [ ! -s $PIDFILE ] && [ "$add_pid" != "" ];then
     echo "$add_pid" > $PIDFILE
 fi
 

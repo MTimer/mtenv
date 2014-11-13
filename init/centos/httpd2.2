@@ -58,10 +58,10 @@ ARGV="$@"
 # |||||||||||||||||||| START CONFIGURATION SECTION  ||||||||||||||||||||
 # --------------------                              --------------------
 # 
-if [ ! -s $server_pid_file ] && [ -n "$add_pid" ]; then
-    server_pid_file=/mtimer/tmp/httpd.pid
-    add_pid=`ps aux | grep "httpd" | grep -v "/bin/sh" | grep -v "grep" | head -1 | awk '{print $2}'`
-    echo "$add_pid" > $server_pid_file
+pidfile=/mtimer/tmp/httpd.pid
+add_pid=`ps aux | grep "httpd" | grep -v "/bin/sh" | grep -v "grep" | head -1 | awk '{print $2}'`
+if [ ! -s $pidfile ] && [ -n "$add_pid" ]; then
+    echo "$add_pid" > $pidfile
 fi
 # 
 # the path to your httpd binary, including options if necessary
