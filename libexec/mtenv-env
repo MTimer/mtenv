@@ -336,11 +336,10 @@ env_Geoip2Install()
 	Downloadfile lib-web/geoip/GeoLite2-Country.mmdb.zip ./
 	mv -f GeoLite2-City.mmdb /usr/local/share/GeoIP/
 	mv -f GeoLite2-Country.mmdb /usr/local/share/GeoIP/
-	git clone --recursive https://github.com/maxmind/libmaxminddb
-	cd libmaxminddb
-	./bootstrap
+	#git clone --recursive https://github.com/maxmind/libmaxminddb
+	Downloadfile lib-web/geoip/libmaxminddb-master.zip
 	./configure
-	make check
+	make
 	make install
 	ldconfig
 }
