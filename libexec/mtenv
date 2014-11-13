@@ -225,10 +225,12 @@ PackageUpdate()
 DownloadPackage()
 {
 	if [ ! -s "${MTENV_V}.tgz" ]; then
-		if ! wget -c --tries=3 ${CN_2}LNMPA-shell/${MTENV_V}.tgz >/dev/null 2>&1 || true; then
+		set +e
+		if ! wget -c --tries=3 ${CN_2}LNMPA-shell/${MTENV_V}.tgz >/dev/null 2>&1; then
 			echo "[Error] Download Failed : ${MTENV_V}.tgz ,Please try again later."
 			exit 1
 		fi
+		set -e
 	fi
 
 	mkdir ${MTENV_PATH}
@@ -262,8 +264,8 @@ Downloadfile()
 		echo "[OK] $package found."
 	else
 		echo "[Notice] $package not found, download now......"
-		if ! wget -c --tries=3 -O ${MPACKAGES_PATH}/$package ${site1}${1}?${randstr} >/dev/null 2>&1 || true; then
-			if ! wget -c --tries=3 -O ${MPACKAGES_PATH}/$package ${site2}${1}?${randstr} >/dev/null 2>&1 || true; then
+		if ! wget -c --tries=3 -O ${MPACKAGES_PATH}/$package ${site1}${1}?${randstr} >/dev/null 2>&1; then
+			if ! wget -c --tries=3 -O ${MPACKAGES_PATH}/$package ${site2}${1}?${randstr} >/dev/null 2>&1; then
 				echo "[Error] Download Failed : $package, please check $1 "
 				exit 1
 			fi

@@ -31,7 +31,7 @@ centos_UpdateSource()
 	yum clean all
 
 	if [ "$OS_VER" = "6" ] && [ "$WHERE" = "china" ]; then
-		wget -c --tries=3 http://mirrors.ustc.edu.cn/epel/6/${machine}/epel-release-6-8.noarch.rpm || true
+		wget -c --tries=3 http://mirrors.ustc.edu.cn/epel/6/${machine}/epel-release-6-8.noarch.rpm
 		#wget -c --tries=3 http://rpms.famillecollet.com/enterprise/remi-release-6.rpm || true
 		rpm -ivh epel-release-6-8.noarch.rpm
 		#rpm -ivh remi-release-6.rpm
@@ -41,7 +41,7 @@ centos_UpdateSource()
 		mv -f /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
 		cp ${MEXTRA_PATH}/CentOS-Base.repo-6 /etc/yum.repos.d/CentOS-Base.repo
 	elif [ "$OS_VER" = "5" ] && [ "$WHERE" = "china" ]; then
-		wget -c --tries=3 http://mirrors.ustc.edu.cn/epel/5/${machine}/epel-release-5-4.noarch.rpm || true
+		wget -c --tries=3 http://mirrors.ustc.edu.cn/epel/5/${machine}/epel-release-5-4.noarch.rpm
 		#wget -c --tries=3 http://rpms.famillecollet.com/enterprise/remi-release-5.rpm || true
 		rpm -ivh epel-release-5-4.noarch.rpm
 		#rpm -ivh remi-release-5.rpm
