@@ -98,6 +98,7 @@ export pcre_dir=pcre-8.35
 export Python_dir=Python-2.7.8
 export asciidoc_dir=asciidoc-8.6.9
 export git_dir=git-2.1.0
+export libmaxminddb_dir=libmaxminddb-1.0.2
 export node_dir=node-v0.10.31
 export redis_dir=redis-2.8.14
 export cmake_dir=cmake-3.0.1
