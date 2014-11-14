@@ -103,6 +103,7 @@ logrotate_Install()
 			done
 			;;
 	esac
+	logrotate_PhpInstall
 	echo -e "\nDone."
 }
 
