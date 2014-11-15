@@ -1,9 +1,7 @@
 #!/bin/sh
 # Startup script for the Apache Web Server
 # chkconfig: 345 85 15
-# Description: Startup script for Apache webserver on CentOS. Place in /etc/init.d and
-# run 'update-rc.d -f httpd defaults', or use the appropriate command on your
-# distro. For CentOS/Redhat run: 'chkconfig --add httpd'
+# Description: Startup script for Apache webserver on Ubuntu.
 
 ### BEGIN INIT INFO
 # Provides:          httpd
@@ -58,11 +56,10 @@ ARGV="$@"
 # |||||||||||||||||||| START CONFIGURATION SECTION  ||||||||||||||||||||
 # --------------------                              --------------------
 # 
-
-if [ ! -s $server_pid_file ] && [ -n "$add_pid" ]; then
-    server_pid_file=/mtimer/tmp/httpd.pid
-    add_pid=`ps aux | grep "httpd" | grep -v "/bin/sh" | grep -v "grep" | head -1 | awk '{print $2}'`
-    echo "$add_pid" > $server_pid_file
+pidfile=/mtimer/tmp/httpd.pid
+add_pid=`ps aux | grep "httpd" | grep -v "/bin/sh" | grep -v "grep" | head -1 | awk '{print $2}'`
+if [ ! -s $pidfile ] && [ -n "$add_pid" ]; then
+    echo "$add_pid" > $pidfile
 fi
 # 
 # the path to your httpd binary, including options if necessary

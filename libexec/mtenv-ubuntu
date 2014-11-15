@@ -187,7 +187,7 @@ ubuntu_PreInstall()
 
 ubuntu_Upgrade()
 {
-	apt-get install -y patch make autoconf2.13 gcc g++ flex file zlibc zlib1g zlib1g-dev zip libzip-dev unzip bzip2 libbz2-dev nano m4 perl libglib2.0-0 libglib2.0-dev libncurses5 libncurses5-dev libcap-dev xmlto sqlite libpam0g-dev libwrap0 libwrap0-dev libkrb5-dev db5.1-util logrotate quota libgd-graph-perl
+	apt-get install -y patch make autoconf2.13 gcc g++ flex file zlibc zlib1g zlib1g-dev zip libzip-dev unzip bzip2 libbz2-dev nano m4 perl libglib2.0-0 libglib2.0-dev libncurses5 libncurses5-dev libcap-dev xmlto sqlite libpam0g-dev libwrap0 libwrap0-dev libkrb5-dev db5.1-util logrotate quota libgd-graph-perl lynx
 	#xz-utils
 }
 
