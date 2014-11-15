@@ -40,6 +40,51 @@ ddos_BfdInstall()
 	echo -e '\nBFD installed.'
 }
 
+ddos_ApfUninstall()
+{
+	echo "Removing apf and/or bfd if it exists..."
+	echo
+
+	if [ -d '/etc/apf' ]; then
+		apf -f
+		rm -fv /etc/cron.daily/fw
+		rm -fv /etc/cron.daily/apf
+		rm -fv /etc/cron.d/refresh.apf
+		rm -fv /etc/logrotate.d/apf
+		rm -fv /var/log/apf*
+		DoInit remove apf
+		rm -fv /etc/init.d/apf
+		rm -Rfv /etc/apf
+
+		rm -fv /etc/cron.d/bfd
+		rm -fv /etc/logrotate.d/bfd
+		rm -fv /var/log/bfd*
+		rm -Rfv /usr/local/bfd
+	fi
+
+	echo
+	echo "...Done"
+}
+
+ddos_CsfInstall()
+{
+	Downloadfile ddos/csf.tgz
+	sh install.sh
+	sh /usr/local/csf/bin/remove_apf_bfd.sh
+	sed -i 's|TESTING = "1"|TESTING = "0"|' /etc/csf/csf.conf
+	echo "# Run external commands before csf configures iptables" >> /usr/local/csf/bin/csfpre.sh
+	echo "# Run external commands after csf configures iptables" >> /usr/local/csf/bin/csfpost.sh
+	csf -x
+}
+
+ddos_CsfUninstall()
+{
+	if [ -d '/etc/csf' ]; then
+		cd /etc/csf
+		sh uninstall.sh
+	fi
+}
+
 ddos_DeflateInstall()
 {
 	mkdir -p /usr/local/ddos/tmp
@@ -79,15 +124,34 @@ ddos_DeflateUninstall()
 
 ddos_Install()
 {
-	ddos_ApfInstall
-	ddos_BfdInstall
+	echo -ne "\nWhich firewall do you want to install? [1]Apf [2]Csf ?"
+	while read WHICH; do
+		case "$WHICH" in
+			"1" ) 
+				ddos_ApfInstall
+				ddos_BfdInstall
+				break ;;
+			"2" ) 
+				ddos_CsfInstall
+				break ;;
+			*) echo -ne "\nIncorrect value option!\nPlease enter the correct value: " ;;
+		esac
+	done
+
 	ddos_DeflateUninstall
 	ddos_DeflateInstall
 }
 
+ddos_Uninstall()
+{
+	ddos_ApfUninstall
+	ddos_CsfUninstall
+	ddos_DeflateUninstall
+}
+
 command="$1"
 case "$command" in
-	"Install" | "DeflateUninstall" )
+	"Install" | "Uninstall" )
 		[ -n "$MTENV_V" ] || exec mtenv help ddos
 		ddos_$command
 		;;
