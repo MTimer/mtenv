@@ -287,8 +287,10 @@ Unpackfile()
 			tar jxf ${MPACKAGES_PATH}/$1 -C ${MUNPACKED_PATH} >/dev/null 2>&1
 			;;
 		tgz|gz)
-			tar zxf ${MPACKAGES_PATH}/$1 -C ${MUNPACKED_PATH} >/dev/null 2>&1 || gunzip ${MPACKAGES_PATH}/$1 >/dev/null 2>&1
-			tar xf ${MPACKAGES_PATH}/${file_name}.tar -C ${MUNPACKED_PATH} >/dev/null 2>&1
+			if ! tar zxf ${MPACKAGES_PATH}/$1 -C ${MUNPACKED_PATH} >/dev/null 2>&1; then
+				gunzip ${MPACKAGES_PATH}/$1 >/dev/null 2>&1
+				tar xf ${MPACKAGES_PATH}/${file_name}.tar -C ${MUNPACKED_PATH} >/dev/null 2>&1
+			fi
 			;;
 		xz)
 			tar Jxf ${MPACKAGES_PATH}/$1 -C ${MUNPACKED_PATH} >/dev/null 2>&1
