@@ -71,7 +71,7 @@ ddos_CsfInstall()
 	Downloadfile ddos/csf.tgz
 	sh install.sh
 	sh /usr/local/csf/bin/remove_apf_bfd.sh
-	sed -i 's|TESTING = "1"|TESTING = "0"|' /etc/csf/csf.conf
+	cp -f ${MCONF_PATH}/ddos/csf/csf.conf /etc/csf/csf.conf
 	echo "# Run external commands before csf configures iptables" >> /usr/local/csf/bin/csfpre.sh
 	echo "# Run external commands after csf configures iptables" >> /usr/local/csf/bin/csfpost.sh
 	csf -x
