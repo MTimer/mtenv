@@ -120,6 +120,7 @@ export vsftpd_dir=vsftpd-3.0.2
 export apf_dir=apf-9.7-2
 export bfd_dir=bfd-1.5-2
 export deflate_dir=deflate-0.6
+export varnish_dir=varnish-4.0.2
 
 RootMust()
 {

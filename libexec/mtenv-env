@@ -195,6 +195,7 @@ env_CurlInstall()
 	find docs \( -name "Makefile*" -o -name "*.1" -o -name "*.3" \) -exec rm {} \;
 	install -v -d -m755 /usr/share/doc/${curl_dir}
 	cp -v -R docs/*     /usr/share/doc/${curl_dir}
+	[ -f /usr/lib/pkgconfig/libcurl.pc ] && cp -f /usr/lib/pkgconfig/libcurl.pc /usr/local/lib/pkgconfig/
 }
 
 env_OpensshInstall()
@@ -250,7 +251,9 @@ env_FreetypeInstall()
 	./configure --prefix=/usr/local/${freetype_dir}
 	make
 	make install
+	# unnecessary if we export PKG_CONFIG_PATH
 	ln -vs /usr/local/${freetype_dir}/include/freetype2/ /usr/local/${freetype_dir}/include/freetype2/freetype
+	[ -f /usr/lib/pkgconfig/freetype2.pc ] && cp -f /usr/lib/pkgconfig/freetype2.pc /usr/local/lib/pkgconfig/
 }
 
 env_LibeventInstall()
@@ -287,7 +290,6 @@ env_ImageMagickInstall()
 	make
 	make install
 	ldconfig
-	#export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
 	ln -vs /usr/local/include/ImageMagick-6/wand /usr/local/include/wand
 	ln -vs /usr/local/include/ImageMagick-6/magick /usr/local/include/magick
 }
@@ -500,6 +502,20 @@ env_LogrotateInstall()
 	./configure --prefix=/usr
 	make
 	make install
+}
+
+env_VarnishInstall()
+{
+	Downloadfile lib-web/varnish/${varnish_dir}.tar.gz
+	export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
+	./configure --prefix=/mtimer/server/varnish
+	make
+	make install
+	#cp -f redhat/varnish.sysconfig /etc/sysconfig/varnish
+	#cp -f redhat/varnish_reload_vcl /usr/bin/varnish_reload_vcl
+	#cp -f ${MCONF_PATH}/varnish/varnish.initrc.${DETECT_OS} /etc/init.d/varnish
+	#chmod +x /etc/init.d/varnish
+	#DoInit add varnish
 }
 
 env_Install()
