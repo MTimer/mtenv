@@ -195,7 +195,7 @@ env_CurlInstall()
 	find docs \( -name "Makefile*" -o -name "*.1" -o -name "*.3" \) -exec rm {} \;
 	install -v -d -m755 /usr/share/doc/${curl_dir}
 	cp -v -R docs/*     /usr/share/doc/${curl_dir}
-	[ -f /usr/lib/pkgconfig/libcurl.pc ] && cp -f /usr/lib/pkgconfig/libcurl.pc /usr/local/lib/pkgconfig/
+	cp -f /usr/lib/pkgconfig/libcurl.pc /usr/local/lib/pkgconfig/ || true
 }
 
 env_OpensshInstall()
@@ -253,7 +253,7 @@ env_FreetypeInstall()
 	make install
 	# unnecessary if we export PKG_CONFIG_PATH
 	ln -vs /usr/local/${freetype_dir}/include/freetype2/ /usr/local/${freetype_dir}/include/freetype2/freetype
-	[ -f /usr/lib/pkgconfig/freetype2.pc ] && cp -f /usr/lib/pkgconfig/freetype2.pc /usr/local/lib/pkgconfig/
+	cp -f /usr/lib/pkgconfig/freetype2.pc /usr/local/lib/pkgconfig/ || true
 }
 
 env_LibeventInstall()
