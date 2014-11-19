@@ -97,6 +97,9 @@ mysql_Config()
 		echo "/mtimer/server/$SQLTYPE/lib/mysql" >> /etc/ld.so.conf.d/mtenv_mysql.conf
 	else
 		cp -f ${MCONF_PATH}/${SQLTYPE}/my-new.cnf /etc/my.cnf
+		if [ "$SQLTODO" = "3" ] || [ "$SQLTODO" = "6" ]; then
+			sed -i 's/#explicit_defaults_for_timestamp = true/explicit_defaults_for_timestamp = true/g' /etc/my.cnf
+		fi
 
 		ln -vs /mtimer/server/${SQLTYPE}/lib /usr/lib/mysql
 		echo "/mtimer/server/$SQLTYPE/lib" >> /etc/ld.so.conf.d/mtenv_mysql.conf

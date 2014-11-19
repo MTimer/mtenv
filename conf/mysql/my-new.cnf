@@ -4,12 +4,13 @@ socket          = /mtimer/tmp/mysql.sock
 
 [mysqld]
 # Add By MTimer Start
+#explicit_defaults_for_timestamp = true
 pid-file = /mtimer/tmp/mysql.pid
 back_log = 500
-datadir		= /mtimer/server/mysql/data
+datadir = /mtimer/server/mysql/data
 default-storage-engine = InnoDB
 character_set_server = utf8
-tmpdir		= /tmp/
+tmpdir = /tmp/
 log-error = /mtimer/log/mysql/mysql_error.log
 slow-query-log = 1
 long_query_time= 5
@@ -17,8 +18,8 @@ slow_query_log_file = /mtimer/log/mysql/mysql_slow.log
 #log-queries-not-using-indexes
 # Add By MTimer End
 
-port            = 3306
-socket          = /mtimer/tmp/mysql.sock
+port = 3306
+socket = /mtimer/tmp/mysql.sock
 skip-external-locking
 key_buffer_size = 16M
 max_allowed_packet = 1M
@@ -37,7 +38,7 @@ query_cache_size= 16M
 #log-bin=mysql-bin
 #binlog_format=mixed
 
-server-id       = 1
+server-id = 1
 
 innodb_data_home_dir = /mtimer/server/mysql/data
 innodb_data_file_path = ibdata1:10M:autoextend
